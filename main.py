@@ -1,8 +1,16 @@
-from Grafo import Grafo
+from GrafoMA import GrafoMA
 
 
-print('Hello World')
+a = GrafoMA(DIRECTED=False, num_vertices=3)
 
-a = Grafo()
+a.add_edge(1,2)
+a.add_edge(1,2, 7)
+a.add_edge(1,2, 'a')
+print(a)
+a.add_vertice()
+a.add_vertice('P')
+print("\n")
+print(a)
 
-print(a.components_number)
+print()
+print(a.vertices_map)
