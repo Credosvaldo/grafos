@@ -10,19 +10,25 @@ class GrafoMA:
         self.edges_map: Dict[str, Tuple[str, str, int]] = {}
         self.DIRECTED = DIRECTED
         self._fill_vertices_map(num_vertices, vertices)
+        self.excluded_vertices_index = []
         
     def __str__(self) -> str:
         string = '[\n  '
-        string += '\n  '.join(str(row) for row in self.matriz_adjacencia)
+        string += '\n  '.join(str(row) for i, row in enumerate(self.matriz_adjacencia) if i not in self.excluded_vertices_index)
         string += '\n]'
         return string
     
     def add_edge(self, v1: str, v2: str, weight: float = 1, name: str = None):
-        if(name in self.edges_map):
+        if name != None and str(name) in self.edges_map:
             raise ValueError("Edge name already exists")
         
-        if(name is not None):
-            name = str(name)
+        new_edge_name = len(self.edges_map) + 1
+        
+        while name is None or name in self.edges_map:
+            name = str(new_edge_name)
+            new_edge_name += 1
+            
+        name = str(name)
 
         v1 = str(v1)
         v2 = str(v2)
@@ -38,12 +44,14 @@ class GrafoMA:
         new_edge_paralel_index = len(self.matriz_adjacencia[v1_index][v2_index])
         
         self.matriz_adjacencia[v1_index][v2_index].append(Edge(name, weight))
-        if name != None: self.edges_map[name] = (v1, v2, new_edge_paralel_index)
+        self.edges_map[name] = (v1, v2, new_edge_paralel_index)
         
         if not self.DIRECTED and v1_index != v2_index:
             self.matriz_adjacencia[v2_index][v1_index].append(Edge(name, weight))
                
     def remove_edge_by_name(self, name: str):
+        name = str(name)
+        
         if name not in self.edges_map:
             raise ValueError("Edge name does not exist")
         
@@ -57,7 +65,7 @@ class GrafoMA:
         if not self.DIRECTED and v1_index != v2_index:
             self.matriz_adjacencia[v2_index][v1_index].pop(parallel_index)
         
-        
+    # Remove all edges between two vertices
     def remove_edge_by_vertices(self, v1: str, v2: str):
         v1 = str(v1)
         v2 = str(v2)
@@ -68,34 +76,87 @@ class GrafoMA:
         v1_index = self.vertices_map[v1].index
         v2_index = self.vertices_map[v2].index
         
-        for edge in self.matriz_adjacencia[v1_index][v2_index]:
-            del self.edges_map[edge.name]
-        
         self.matriz_adjacencia[v1_index][v2_index] = []
+        edges_to_remove = [key for key, value in self.edges_map.items() if value[0] == v1 and value[1] == v2]
+        for edge in edges_to_remove:
+            self.edges_map.pop(edge)
+        
         if not self.DIRECTED:
             self.matriz_adjacencia[v2_index][v1_index] = []
+            edges_to_remove = [key for key, value in self.edges_map.items() if value[0] == v2 and value[1] == v1]
+            for edge in edges_to_remove:
+                self.edges_map.pop(edge)
                
     def add_vertice(self, name: str = None, weight: float = 0):
-        if name in self.vertices_map:
-            raise ValueError("Vertice already exists")
+        if str(name) in self.vertices_map:
+            raise ValueError("Vertice already exists")      
         
-        new_vertice_index = len(self.matriz_adjacencia)
-        new_size = new_vertice_index + 1
-        
-        if(name is None):
-            name = str(new_size)
+        matriz_size = len(self.matriz_adjacencia)
+        vertice_name_index = matriz_size
+        new_size = matriz_size + 1
+
+        if self.excluded_vertices_index:
+            new_vertice_index = self.excluded_vertices_index.pop(0)
+            usin_a_excluded_vertice = True
+        else:
+            new_vertice_index = len(self.matriz_adjacencia)
+            usin_a_excluded_vertice = False
             
+        while name is None or name in self.vertices_map:
+            name = str(vertice_name_index)
+            vertice_name_index += 1
+            
+        name = str(name)
         self.vertices_map[name] = Node(new_vertice_index, weight)
-        self.matriz_adjacencia.append([[] for _ in range(new_size)])
         
-        for i in range(new_vertice_index):
+        if usin_a_excluded_vertice:
+            return
+        
+        self.matriz_adjacencia.append([[] for _ in range(new_size)])
+        for i in range(matriz_size):
             self.matriz_adjacencia[i].append([])
     
-    def thers_vertice_adjacente(self, v1, v2):
-        return self.matriz_adjacencia[v1][v2] != []
+    def remove_vertice(self, name: str):
+        name = str(name)
+        
+        if name not in self.vertices_map:
+            raise ValueError("Vertice does not exist")
+        
+        vertice_index = self.vertices_map[name].index
+        self.excluded_vertices_index.append(vertice_index)
+        
+        for i in range(len(self.matriz_adjacencia)):
+            for edge in self.matriz_adjacencia[i][vertice_index]:
+                del self.edges_map[edge.name]
+                    
+            if self.DIRECTED:
+                for edge in self.matriz_adjacencia[vertice_index][i]:
+                    del self.edges_map[edge.name]
+                    
+            self.matriz_adjacencia[i][vertice_index] = []
+            self.matriz_adjacencia[vertice_index][i] = []
+        
+        self.vertices_map.pop(name)
     
-    def thers_edge_adjacence(self):
-        pass
+    def thers_vertice_adjacente(self, v1: str, v2: str):
+        v1 = str(v1)
+        v2 = str(v2)
+        
+        v1_index = self.vertices_map[v1].index
+        v2_index = self.vertices_map[v2].index
+        
+        return self.matriz_adjacencia[v1_index][v2_index] != []
+    
+    def thers_edge_adjacence(self, ed1: str, ed2: str):
+        ed1 = str(ed1)
+        ed2 = str(ed2)
+        
+        vertices_ed1 = self.edges_map[ed1]
+        vertices_ed2 = self.edges_map[ed2]
+        
+        return any(v in vertices_ed2[:2] for v in vertices_ed1[:2])
+        
+        
     
     def is_empty(self):
         return len(self.matriz_adjacencia) == 0
