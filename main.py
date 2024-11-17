@@ -1,16 +1,15 @@
-from GrafoMA import GrafoMA
+from Grafo import GrafoMA
+
+a = GrafoMA(DIRECTED=False)
 
 
-a = GrafoMA(DIRECTED=False, num_vertices=3)
-
-a.add_edge(1,2)
-a.add_edge(1,2, 7)
-a.add_edge(1,2, 'a')
-print(a)
 a.add_vertice()
-a.add_vertice('P')
-print("\n")
+a.add_vertice()
+a.add_vertice()
 print(a)
 
-print()
-print(a.vertices_map)
+a.add_edge(1, 2, 5, 'a')
+
+
+print(a)
+print(a.edges_map)

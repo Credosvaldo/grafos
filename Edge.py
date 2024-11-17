@@ -1,6 +1,6 @@
 class Edge:
     
-    def __init__(self, name=None, weight=1) -> None:
+    def __init__(self, name: str = None, weight=1) -> None:
         self.name = name
         self.weight = weight
         
