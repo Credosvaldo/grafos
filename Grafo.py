@@ -1,6 +1,7 @@
 from typing import Dict, List, Tuple
 from Edge import Edge
 from Node import Node
+from datetime import datetime
 
 class GrafoMA:
     
@@ -320,3 +321,24 @@ class GrafoMA:
         aux = self.make_underlying_graph()
         print("Underlying Graph")
         print(str(aux))
+        
+        
+
+    def show(self):
+        f= open("graph.gexf","w+")
+        f.write("<gexf xmlns=\"http://gexf.net/1.3\" xmlns:viz=\"http://gexf.net/1.3/viz\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://gexf.net/1.3 http://gexf.net/1.3/gexf.xsd\" version=\"1.3\">\n")
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        f.write(f"<meta lastmodifieddate=\"{current_date}\">\n<creator>Gexf.net</creator>\n<description>A hello world! file</description>\n</meta>")
+        f.write(f"<graph defaultedgetype=\"{'directed' if self.DIRECTED else 'undirected'}\">\n<nodes>\n")
+       
+        for node in self.nodes_map.keys():
+            f.write("<node id=\""+str(node)+"\" label=\""+str(node)+"\"/>\n")
+            
+        f.write("</nodes>\n<edges>\n")
+        
+        for i in range(len(self.matrix_adjacency)):
+            for j in range(len(self.matrix_adjacency[i])):
+                for edge in self.matrix_adjacency[i][j]:
+                    f.write("<edge id=\""+edge.name+"\" source=\""+ self.edges_map[edge.name][0]+"\" target=\""+ self.edges_map[edge.name][1]+"\" weight=\""+str(edge.weight)+"\"/>\n")
+        f.write("</edges>\n</graph>\n</gexf>")
+        

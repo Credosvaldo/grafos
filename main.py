@@ -16,3 +16,4 @@ b = a.make_underlying_graph()
 
 print(b)
 
+a.show()
