@@ -11,9 +11,8 @@ a.add_edge(3, 2, 5)
 print(a)
 
 
-a.remove_all_edge_by_vertices(3, 2)
-print(a)
-print(a.edges_map)
-print(a.vertices_map)
 
-a.thers_vertice_adjacente(90, 87)
+b = a.make_underlying_graph()
+
+print(b)
+
