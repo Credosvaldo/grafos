@@ -1,12 +1,14 @@
 from typing import Dict, List, Tuple
+from DFSNode import DFSNode
 from Edge import Edge
 from Node import Node
 from datetime import datetime
 
+
 class GrafoMA:
     
     def __init__(self, DIRECTED: bool = True, num_nodes: int = 0, nodes: List[Tuple[str, float]] = []):
-        self.matrix_adjacency = self._create_matrix(num_nodes)
+        self.matrix_adjacency: List[List[List[Edge]]] = self._create_matrix(num_nodes)
         self.nodes_map: Dict[str, Node] = {}
         self.edges_map: Dict[str, Tuple[str, str, int]] = {}
         self.DIRECTED = DIRECTED
@@ -14,6 +16,7 @@ class GrafoMA:
         self._fill_nodes_map(num_nodes, nodes)
         
     def __str__(self):
+        return self.show_some()
         result = "   Adjacency Matrix\n\n"
         result += "      "
         for i in range(len(self.nodes_map)):
@@ -274,12 +277,13 @@ class GrafoMA:
             raise ValueError("Graph is not directed")
 
         new_graph = GrafoMA(True)
+        size = len(self.matrix_adjacency)
 
-        for node in self.nodes_map.keys():
-            new_graph.add_node(node, self.nodes_map[node].weight)
+        for name, node in self.nodes_map:
+            new_graph.add_node(name, node.weight)
 
-        for i in range(len(self.matrix_adjacency)):
-            for j in range(len(self.matrix_adjacency[i])):
+        for i in range(size):
+            for j in range(size):
                 edge = self.matrix_adjacency[i][j]
                 if edge.__len__() == 0:
                     continue
@@ -301,11 +305,13 @@ class GrafoMA:
             raise ValueError("Graph is not directed")
 
         new_graph = GrafoMA(False)
-        for node in self.nodes_map.keys():
-            new_graph.add_node(node, self.nodes_map[node].weight)
+        size = len(self.matrix_adjacency)
+        
+        for name, node in self.nodes_map:
+            new_graph.add_node(name, node.weight)
 
-        for i in range(len(self.matrix_adjacency)):
-            for j in range(len(self.matrix_adjacency[i])):
+        for i in range(size):
+            for j in range(size):
                 edge = self.matrix_adjacency[i][j]
                 if edge.__len__() == 0:
                     continue
@@ -321,8 +327,7 @@ class GrafoMA:
         aux = self.make_underlying_graph()
         print("Underlying Graph")
         print(str(aux))
-        
-        
+
 
     def show(self):
         f= open("graph.gexf","w+")
@@ -341,4 +346,46 @@ class GrafoMA:
                 for edge in self.matrix_adjacency[i][j]:
                     f.write("<edge id=\""+edge.name+"\" source=\""+ self.edges_map[edge.name][0]+"\" target=\""+ self.edges_map[edge.name][1]+"\" weight=\""+str(edge.weight)+"\"/>\n")
         f.write("</edges>\n</graph>\n</gexf>")
+        
+        
+    def _depth_first_search(self, graph: 'GrafoMA' = None):
+        
+        time = [0]
+        result: Dict[str, DFSNode] = {}
+        
+        for node_name in self.nodes_map.keys():
+            result[node_name] = DFSNode(0, 0, None)
+            
+        for node_name, node_value in result.items():
+            if node_value.discovery_time == 0:
+                self._dfs(node_name, time, result)
+                
+        print(result)
+        print(time)
+        
+    def _dfs(self, node_name, time, result): 
+        node_name = str(node_name)
+        time[0] += 1
+        result[node_name].discovery_time = time[0]
+        size = len(self.matrix_adjacency)
+        
+        node_index = self.nodes_map[node_name].index
+        
+        for i in range(size):
+            if self.matrix_adjacency[node_index][i]:
+                edge_name = self.matrix_adjacency[node_index][i][0].name
+                edge_nodes = self.edges_map[edge_name]
+                successor_name = edge_nodes[1] if edge_nodes[1] != node_name else edge_nodes[0]
+                
+                if result[successor_name].discovery_time == 0:
+                    result[successor_name].parent = node_name
+                    self._dfs(successor_name, time, result)
+        
+        time[0] += 1
+        result[node_name].finishing_time = time[0]
+        
+    def connectivity_degree(self):
+        graph = self.make_underlying_graph()
+    
+    
         

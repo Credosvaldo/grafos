@@ -1,3 +1,4 @@
+from DFSNode import DFSNode
 from Grafo import GrafoMA
 
 a = GrafoMA(DIRECTED=True)
@@ -11,9 +12,4 @@ a.add_edge(3, 2, 5)
 print(a)
 
 
-
-b = a.make_underlying_graph()
-
-print(b)
-
-a.show()
+a._depth_first_search()
