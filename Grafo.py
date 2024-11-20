@@ -216,8 +216,8 @@ class GrafoMA:
         return name in self.edges_map
     
     def thers_edge_by_nodes(self, predecessor: str, successor: str):
-        v1 = str(v1)
-        v2 = str(v2)
+        v1 = str(predecessor)
+        v2 = str(successor)
     
         v1_index = self.nodes_map[v1].index
         v2_index = self.nodes_map[v2].index
