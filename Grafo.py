@@ -243,6 +243,15 @@ class GrafoMA:
                     return False
         return True
     
+    def is_simple(self):
+        size = len(self.matrix_adjacency)
+        for i in range(size):
+            for j in range(size):
+                if i != j and len(self.matrix_adjacency[i][j]) > 1:
+                    return False
+                if i == j and len(self.matrix_adjacency[i][j]) != 0:
+                    return False
+        return True
     
     def _create_matrix(self, rows, cols=None):
         if cols is None:
