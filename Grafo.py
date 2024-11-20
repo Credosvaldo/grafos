@@ -480,3 +480,61 @@ class GrafoMA:
             excluded_edges.append(excluded)
         
         return excluded_edges
+    
+    def get_euler_path(self):
+        """
+        Get the Euler Path of the graph.
+        Returns:
+            List[str]: A list with the nodes name of the Euler Path.
+        """
+        if self.is_empty():
+            return []
+        
+        if not self.is_connected():
+            return []
+        
+        if not self.is_simple():
+            raise ValueError("Graph is not simple")
+        
+        euler_path: List[str] = []
+        copy_graph = self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
+        
+        nodes_degree = copy_graph.get_all_nodes_degree()
+        odd_degree_nodes = [node for node, degree in nodes_degree.items() if degree % 2 != 0]
+        
+        if len(odd_degree_nodes) >= 3:
+            return []
+        
+        current_node = odd_degree_nodes[0] if odd_degree_nodes else next(iter(self.nodes_map))
+        
+        while copy_graph.get_edge_count() > 0:
+            edges_of_current_node = self.get_edges_by_node(current_node)
+            if len(edges_of_current_node) == 1:
+                chosen_edge = edges_of_current_node[0]
+                
+                
+        
+    def get_edges_by_node(self, node: str):
+        """
+        Get all edges that are connected to the given node.
+        Args:
+            node (str): The node name.
+        Returns:
+            List[str]: A list with the edges name.
+        """
+        node = str(node)
+        node_index = self.nodes_map[node].index
+        edges_name = [edge.name for sublist in self.matrix_adjacency[node_index] for edge in sublist]
+        return edges_name
+        
+    def get_all_nodes_degree(self):
+        nodes_degree: Dict[str, int] = {}
+        for node_name in self.nodes_map.keys():
+            nodes_degree[node_name] = 0
+            node_index = self.nodes_map[node_name].index
+            size = len(self.matrix_adjacency)
+            for i in range(size):
+                edges = self.matrix_adjacency[node_index][i]
+                nodes_degree[node_name] += len(edges)
+        return nodes_degree
+        
