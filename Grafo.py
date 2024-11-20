@@ -3,7 +3,7 @@ from DFSNode import DFSNode
 from Edge import Edge
 from Node import Node
 from datetime import datetime
-
+import copy
 
 class GrafoMA:
     
@@ -105,6 +105,11 @@ class GrafoMA:
         v1, v2, parallel_index = self.edges_map[name]
         v1_index = self.nodes_map[v1].index
         v2_index = self.nodes_map[v2].index
+        
+        for edge in self.matrix_adjacency[v1_index][v2_index][parallel_index + 1:]:
+            temp_list = list(self.edges_map[edge.name])
+            temp_list[2] -= 1
+            self.edges_map[edge.name] = tuple(temp_list)
         
         self.matrix_adjacency[v1_index][v2_index].pop(parallel_index)
         del self.edges_map[name]
@@ -307,15 +312,15 @@ class GrafoMA:
         new_graph = GrafoMA(False)
         size = len(self.matrix_adjacency)
         
-        for name, node in self.nodes_map:
+        for name, node in self.nodes_map.items():
             new_graph.add_node(name, node.weight)
 
         for i in range(size):
             for j in range(size):
-                edge = self.matrix_adjacency[i][j]
-                if edge.__len__() == 0:
+                edges = self.matrix_adjacency[i][j]
+                if edges.__len__() == 0:
                     continue
-                for edge in edge:
+                for edge in edges:
                     new_graph.add_edge(
                         self.edges_map[edge.name][0], self.edges_map[edge.name][1], edge.weight, edge.name
                     )
@@ -386,6 +391,49 @@ class GrafoMA:
         
     def connectivity_degree(self):
         graph = self.make_underlying_graph()
+        
+        
+    def is_connected(self):
+        """
+        Check if the graph is connected.
+        Returns:
+            bool: True if the graph is connected, False otherwise.
+        """
+        if self.is_empty():
+            return True
+        
+        if self.DIRECTED:
+            graph = self.make_underlying_graph()
+            return graph.is_connected()
+        
+        time = [0]
+        result: Dict[str, DFSNode] = {}
+        
+        for node_name in self.nodes_map.keys():
+            result[node_name] = DFSNode(0, 0, None)
+
+        first_node = next(iter(self.nodes_map))
+        self._dfs(first_node, time, result)
+        
+        return time[0] == len(self.nodes_map) * 2
     
-    
+    def get_bridge(self):
+        """
+        Get all bridge edges in the graph.
+        Returns:
+            List[Edges]: A list with all bridge edges name.
+        """
+        if self.is_empty():
+            return []
+        
+        bridges: List[str] = []
+        copy_graph = self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
+        
+        for edge_name, edge_nodes in self.edges_map.items():
+            copy_graph.remove_edge_by_name(edge_name)
+            if not copy_graph.is_connected():
+                bridges.append(edge_name)
+            copy_graph.add_edge(edge_nodes[0], edge_nodes[1], 1, edge_name)
+        
+        return bridges
         
