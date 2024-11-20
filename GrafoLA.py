@@ -1,6 +1,5 @@
 from typing import Dict, List, Tuple
 from DFSNode import DFSNode
-from Edge import Edge
 from ExcludedEdge import ExcludedEdge
 from NodeLA import NodeLA
 from datetime import datetime
@@ -13,7 +12,7 @@ class GrafoLA:
         self,
         DIRECTED: bool = True,
         num_nodes: int = 0,
-        nodes: List[NodeLA] = [], # replace to tupla
+        nodes: List[NodeLA] = [],  # replace to tupla
     ):
 
         self.nodes_map: Dict[str, NodeLA] = {}
@@ -84,6 +83,7 @@ class GrafoLA:
         else:
             raise ValueError("NodeLA name not found")
 
+    # Check loop e parallel edge
     def add_edge(self, predecessor: str, successor: str, weight: float, name: str):
         """
         Adds an edge to the graph.
@@ -103,7 +103,7 @@ class GrafoLA:
 
         self.list_adjacency[predecessor].append(self.nodes_map[successor])
 
-        if not self.DIRECTED:
+        if not self.DIRECTED and predecessor != successor:
             self.list_adjacency[successor].append(self.nodes_map[predecessor])
 
         self.edges_map[name] = (predecessor, successor, weight)
@@ -161,7 +161,7 @@ class GrafoLA:
         for node in self.list_adjacency:
             result += f"{node} -> "
             for neighbor in self.list_adjacency[node]:
-                result += f"[{neighbor.name}] ->"
+                result += f"[{neighbor.name}] -> "
             result += "\n"
         return result
 

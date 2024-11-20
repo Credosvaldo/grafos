@@ -20,11 +20,10 @@ b.add_node("3", 9)
 
 b.add_edge("1", "2", 7, "1-2")
 b.add_edge("3", "2", 8, "3-2")
+b.add_edge("3", "2", 1, "3-2")
+b.add_edge("3", "3", 9, "3-3")
+
 print(b)
 
-b.remove_node("2")
-print(b)
 
-
-c = GrafoLA(DIRECTED=True, num_nodes=12)
-print(c)
+print(b.thers_edge_by_nodes("1", "2"))
