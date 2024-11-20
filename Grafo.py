@@ -1,6 +1,7 @@
 from typing import Dict, List, Tuple
 from DFSNode import DFSNode
 from Edge import Edge
+from ExcludedEdge import ExcludedEdge
 from Node import Node
 from datetime import datetime
 import copy
@@ -437,3 +438,36 @@ class GrafoMA:
         
         return bridges
         
+    def get_articulations(self):
+        
+        if self.is_empty():
+            return []
+        
+        articulations: List[str] = []
+        excluded_edges: List[ExcludedEdge] = []
+        
+        copy_graph = self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
+        
+        for node_name in self.nodes_map.keys():
+            excluded_edges = copy_graph._get_excluded_edges_by_node(node_name)
+            copy_graph.remove_node(node_name)
+            
+            if not copy_graph.is_connected():
+                articulations.append(node_name)
+                
+            copy_graph.add_node(node_name)
+            for excluded_edge in excluded_edges:
+                copy_graph.add_edge(excluded_edge.v1, excluded_edge.v2, 1, excluded_edge.name)
+                
+        
+        return articulations
+    
+    def _get_excluded_edges_by_node(self, node: str):
+        node = str(node)
+        edges_name = [edge.name for sublist in self.matrix_adjacency[self.nodes_map[node].index] for edge in sublist]
+        excluded_edges = []
+        for name in edges_name:
+            excluded = ExcludedEdge(name, self.edges_map[name][0], self.edges_map[name][1])
+            excluded_edges.append(excluded)
+        
+        return excluded_edges
