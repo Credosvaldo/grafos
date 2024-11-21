@@ -1,3 +1,4 @@
+from multiprocessing import Process
 from typing import Dict, List, Tuple
 from models.DFSNode import DFSNode
 from models.Edge import Edge
@@ -372,8 +373,7 @@ class GrafoMA:
             if node_value.discovery_time == 0:
                 self._dfs(node_name, time, result)
 
-        print(result)
-        print(time)
+        return result
 
     def _dfs(self, node_name, time, result):
         node_name = str(node_name)
@@ -689,3 +689,13 @@ class GrafoMA:
 
             self.add_edge(source, target, edge["@weight"], edge["@label"])
         return self
+
+    def kosaraju(self):
+        p1 = Process(target=self._depth_first_search())
+        p2 = Process(target=self.make_revert_graph())
+        
+        p1.start()
+        p2.start()
+        
+        p1.join()
+        p2.join()
