@@ -23,8 +23,6 @@
 </nodes>
 <edges>
 <edge label='1-2' source='1' target='2' weight='7'/>
-<edge label='3-2' source='3' target='2' weight='8'/>
-<edge label='3-2-b' source='3' target='2' weight='1'/>
 <edge label='3-3' source='3' target='3' weight='9'/>
 <edge label='2-1' source='2' target='1' weight='9'/>
 <edge label='3-1' source='3' target='1' weight='9'/>

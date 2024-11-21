@@ -32,6 +32,8 @@ b.add_edge("1", "3", 9, "1-3")
 b.add_edge("3", "1", 9, "3-1-b")
 print(b)
 
+b.remove_all_edge_by_nodes("3", "2")
+print(b)
 
 print(b.thers_edge_by_nodes("1", "2"))
 print(b.is_empty())

@@ -156,12 +156,12 @@ class GrafoLA:
 
         This method removes all edges between the predecessor and successor nodes from the graph.
         """
-        for key in self.edges_map:
+        for key in list(self.edges_map.keys()):
             v1, v2, _ = self.edges_map[
                 key
             ]  # _ is the weight of the edge that we are not using
             if v1 == predecessor and v2 == successor:
-                self.remove_edge(edge)
+                self.remove_edge(key)
 
     def __str__(self):
         result = " List Adjacency\n"
