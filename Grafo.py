@@ -446,6 +446,26 @@ class GrafoMA:
             copy_graph.add_edge(edge_nodes[0], edge_nodes[1], 1, edge_name)
         
         return bridges
+    
+    def is_bridget(self, edge_name: str):
+        """
+        Check if the given edge is a bridge.
+        Args:
+            edge_name (str): The edge name.
+        Returns:
+            bool: True if the edge is a bridge, False otherwise.
+        """
+        edge_name = str(edge_name)
+        
+        if edge_name not in self.edges_map:
+            raise ValueError("Edge name does not exist")
+        
+        copy_graph = self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
+        copy_graph.remove_edge_by_name(edge_name)
+        
+        is_bridge = not copy_graph.is_connected()
+        
+        return is_bridge
         
     def get_articulations(self):
         
@@ -470,6 +490,26 @@ class GrafoMA:
                 
         
         return articulations
+    
+    def is_articulation(self, node_name: str):
+        """
+        Check if the given node is an articulation.
+        Args:
+            node_name (str): The node name.
+        Returns:
+            bool: True if the node is an articulation, False otherwise.
+        """
+        node_name = str(node_name)
+        
+        if node_name not in self.nodes_map:
+            raise ValueError("Node name does not exist")
+        
+        copy_graph = self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
+        copy_graph.remove_node(node_name)
+        
+        is_articulation = not copy_graph.is_connected()
+        
+        return is_articulation
     
     def _get_excluded_edges_by_node(self, node: str):
         node = str(node)
@@ -496,8 +536,11 @@ class GrafoMA:
         if not self.is_simple():
             raise ValueError("Graph is not simple")
         
+        if self.DIRECTED:
+            raise ValueError("Graph is directed")
+        
         euler_path: List[str] = []
-        copy_graph = self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
+        copy_graph = copy.deepcopy(self)
         
         nodes_degree = copy_graph.get_all_nodes_degree()
         odd_degree_nodes = [node for node, degree in nodes_degree.items() if degree % 2 != 0]
@@ -508,9 +551,26 @@ class GrafoMA:
         current_node = odd_degree_nodes[0] if odd_degree_nodes else next(iter(self.nodes_map))
         
         while copy_graph.get_edge_count() > 0:
-            edges_of_current_node = self.get_edges_by_node(current_node)
+            euler_path.append(current_node)
+            edges_of_current_node = copy_graph.get_edges_by_node(current_node)
+            
             if len(edges_of_current_node) == 1:
                 chosen_edge = edges_of_current_node[0]
+            else:
+                for edge_name in edges_of_current_node:
+                    if not copy_graph.is_bridget(edge_name):
+                        chosen_edge = edge_name
+                        break
+                    
+            v1, v2, _ = copy_graph.edges_map[chosen_edge]
+            copy_graph.remove_edge_by_name(chosen_edge)
+            current_node = v2 if v1 == current_node else v1
+            
+        if copy_graph.get_edge_count() != 0:
+            raise ValueError("Graph has more than one connected component")
+            
+        return euler_path
+            
                 
                 
         
