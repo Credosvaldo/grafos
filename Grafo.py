@@ -4,6 +4,7 @@ from Edge import Edge
 from ExcludedEdge import ExcludedEdge
 from Node import Node
 from datetime import datetime
+from multiprocessing import Process
 import copy
 
 class GrafoMA:
@@ -375,8 +376,7 @@ class GrafoMA:
             if node_value.discovery_time == 0:
                 self._dfs(node_name, time, result)
                 
-        print(result)
-        print(time)
+        return result
         
     def _dfs(self, node_name, time, result): 
         node_name = str(node_name)
@@ -571,9 +571,6 @@ class GrafoMA:
             
         return euler_path
             
-                
-                
-        
     def get_edges_by_node(self, node: str):
         """
         Get all edges that are connected to the given node.
@@ -597,4 +594,15 @@ class GrafoMA:
                 edges = self.matrix_adjacency[node_index][i]
                 nodes_degree[node_name] += len(edges)
         return nodes_degree
+        
+    def kosaraju(self):
+        p1 = Process(target=self._depth_first_search())
+        p2 = Process(target=self.make_revert_graph())
+        
+        p1.start()
+        p2.start()
+        
+        p1.join()
+        p2.join()
+        
         
