@@ -1,6 +1,6 @@
 import unittest
 from GrafoLA import GrafoLA
-from models.NodeLA import NodeLA
+
 
 class TestGrafoLA(unittest.TestCase):
 
@@ -79,5 +79,78 @@ class TestGrafoLA(unittest.TestCase):
         self.graph.add_edge("A", "B", 3.0, "edge1")
         self.assertEqual(self.graph.get_articulations(), ["A", "B"])
 
-if __name__ == '__main__':
+    def test_thers_node_adjacency(self):
+        self.graph.add_node("A", 1.0)
+        self.graph.add_node("B", 2.0)
+        self.graph.add_edge("A", "B", 3.0, "edge1")
+        self.assertTrue(self.graph.thers_node_adjacency("A", "B"))
+        self.assertFalse(self.graph.thers_node_adjacency("B", "A"))
+
+    def test_thers_edge_by_name(self):
+        self.graph.add_node("A", 1.0)
+        self.graph.add_node("B", 2.0)
+        self.graph.add_edge("A", "B", 3.0, "edge1")
+        self.assertTrue(self.graph.thers_edge_by_name("edge1"))
+        self.assertFalse(self.graph.thers_edge_by_name("edge2"))
+
+    def test_thers_edge_by_nodes(self):
+        self.graph.add_node("A", 1.0)
+        self.graph.add_node("B", 2.0)
+        self.graph.add_edge("A", "B", 3.0, "edge1")
+        self.assertTrue(self.graph.thers_edge_by_nodes("A", "B"))
+        self.assertFalse(self.graph.thers_edge_by_nodes("B", "A"))
+
+    def test_thers_edge_adjacency(self):
+        self.graph.add_node("A", 1.0)
+        self.graph.add_node("B", 2.0)
+        self.graph.add_node("C", 3.0)
+        self.graph.add_node("D", 4.0)
+        self.graph.add_edge("A", "B", 3.0, "edge1")
+        self.graph.add_edge("B", "A", 3.0, "edge2")
+        self.graph.add_edge("D", "C", 3.0, "edge3")
+        self.assertTrue(self.graph.thers_edge_adjacency("edge1", "edge2"))
+        self.assertFalse(self.graph.thers_edge_adjacency("edge1", "edge3"))
+
+    def test_get_all_nodes_degree(self):
+        self.graph.add_node("A", 1.0)
+        self.graph.add_node("B", 2.0)
+        self.graph.add_edge("A", "B", 3.0, "edge1")
+        self.assertEqual(self.graph.get_all_nodes_degree(), {"A": 1, "B": 1})
+
+    def test_get_euler_path(self):
+        self.graph.DIRECTED = False
+        self.graph.add_node("A", 1.0)
+        self.graph.add_node("B", 2.0)
+        self.graph.add_edge("A", "B", 3.0, "edge1")
+
+        euler_path = self.graph.get_euler_path()
+        self.assertEqual(euler_path, ["A", "B"])
+
+    def test_is_bridget(self):
+        self.graph.add_node("A", 1.0)
+        self.graph.add_node("B", 2.0)
+        self.graph.add_edge("A", "B", 3.0, "edge1")
+        self.assertTrue(self.graph.is_bridget("edge1"))
+
+    def test_is_articulation(self):
+        self.graph.add_node("A", 1.0)
+        self.graph.add_node("B", 2.0)
+        self.graph.add_edge("A", "B", 3.0, "edge1")
+        self.assertTrue(self.graph.is_articulation("A"))
+        self.graph.add_node("C", 3.0)
+        self.graph.add_edge("B", "C", 4.0, "edge2")
+        self.assertFalse(self.graph.is_articulation("B"))
+
+    def test_make_underlying_graph(self):
+        self.graph.add_node("A", 1.0)
+        self.graph.add_node("B", 2.0)
+        self.graph.add_edge("A", "B", 3.0, "edge1")
+        underlying_graph = self.graph.make_underlying_graph()
+        self.assertFalse(underlying_graph.DIRECTED)
+        self.assertIn("A", underlying_graph.nodes_map)
+        self.assertIn("B", underlying_graph.nodes_map)
+        self.assertIn("edge1", underlying_graph.edges_map)
+
+
+if __name__ == "__main__":
     unittest.main()
