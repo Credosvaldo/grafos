@@ -238,15 +238,25 @@ class GrafoLA:
 
         return any(v in nodes_ed2[:2] for v in nodes_ed1[:2])
 
-    def get_all_nodes_degree(self):
-        nodes_degree: Dict[str, int] = {}
-        for node_name in self.nodes_map.keys():
-            nodes_degree[node_name] = 0
-            size = len(self.list_adjacency)
-            for edge in self.edges_map.values():
-                if node_name in edge[:2]:
-                    nodes_degree[node_name] += 1
-        return nodes_degree
+    def get_edges_by_node(self, node_name: str):
+        """
+        Get all edges that are adjacent to a node.
+
+        Args:
+            node_name (str): The name of the node.
+
+        Returns:
+            List[str]: A list with the names of the edges adjacent to the node.
+        """
+        node_name = str(node_name)
+        edges = []
+        for key in self.edges_map:
+            v1, v2, _ = self.edges_map[key]
+            if (v1 == node_name or v2 == node_name) and not self.DIRECTED:
+                edges.append(key)
+            elif v1 == node_name:
+                edges.append(key)
+        return edges
 
     # endregion
     # region Graph Section
