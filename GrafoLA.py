@@ -391,11 +391,7 @@ class GrafoLA:
 
     def _get_excluded_edges_by_node(self, node: str):
         node = str(node)
-        edges_name = [
-            edge.name
-            for sublist in self.matrix_adjacency[self.nodes_map[node].index]
-            for edge in sublist
-        ]
+        edges_name = [key for key in self.edges_map if node in self.edges_map[key]]
         excluded_edges = []
         for name in edges_name:
             excluded = ExcludedEdge(
