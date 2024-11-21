@@ -1,9 +1,9 @@
 from typing import Dict, List, Tuple
-from DFSNode import DFSNode
-from ExcludedEdge import ExcludedEdge
-from NodeLA import NodeLA
-from datetime import datetime
+from models.DFSNode import DFSNode
+from models.ExcludedEdge import ExcludedEdge
+from models.NodeLA import NodeLA
 import copy
+import xmltodict
 
 
 class GrafoLA:
@@ -22,6 +22,15 @@ class GrafoLA:
         self.DIRECTED = DIRECTED
         self.list_adjacency: Dict[str, List[NodeLA]] = {}
         self.create_adjacency_list(num_nodes, nodes)
+
+    def __str__(self):
+        result = " List Adjacency\n"
+        for node in self.list_adjacency:
+            result += f"{node} -> "
+            for neighbor in self.list_adjacency[node]:
+                result += f"[{neighbor.name}] -> "
+            result += "\n"
+        return result
 
     def create_adjacency_list(self, num_nodes: int, nodes: List[NodeLA]):
         if nodes == [] and num_nodes == 0:
@@ -45,6 +54,7 @@ class GrafoLA:
                 name = str(name)
                 self.add_node(name, 0)
 
+    # region Node Section
     def add_node(self, name: str, weight: float = 0):
         """
         Adds a new node to the graph.
@@ -86,7 +96,30 @@ class GrafoLA:
         else:
             raise ValueError("NodeLA name not found")
 
-    # Check loop e parallel edge
+    def thers_node_adjacency(self, predecessor: str, successor: str):
+        v1 = str(predecessor)
+        v2 = str(successor)
+
+        if v1 not in self.list_adjacency or v2 not in self.list_adjacency:
+            raise ValueError("nodes does not exist")
+
+        for neighbor in self.list_adjacency[predecessor]:
+            if neighbor.name == successor:
+                return True
+        return False
+
+    def get_all_nodes_degree(self):
+        nodes_degree: Dict[str, int] = {}
+        for node_name in self.nodes_map.keys():
+            nodes_degree[node_name] = 0
+            size = len(self.list_adjacency)
+            for edge in self.edges_map.values():
+                if node_name in edge[:2]:
+                    nodes_degree[node_name] += 1
+        return nodes_degree
+
+    # endregion
+    # region Edge Section
     def add_edge(
         self, predecessor: str, successor: str, weight: float, name: str = None
     ):
@@ -175,15 +208,6 @@ class GrafoLA:
             if v1 == predecessor and v2 == successor:
                 self.remove_edge(key)
 
-    def __str__(self):
-        result = " List Adjacency\n"
-        for node in self.list_adjacency:
-            result += f"{node} -> "
-            for neighbor in self.list_adjacency[node]:
-                result += f"[{neighbor.name}] -> "
-            result += "\n"
-        return result
-
     def thers_edge_by_name(self, name: str):
 
         if name in self.edges_map:
@@ -202,27 +226,6 @@ class GrafoLA:
 
         return False
 
-    def is_empty(self):
-        return len(self.list_adjacency) == 0
-
-    def get_edge_count(self):
-        return len(self.edges_map)
-
-    def get_node_count(self):
-        return len(self.list_adjacency)
-
-    def thers_node_adjacency(self, predecessor: str, successor: str):
-        v1 = str(predecessor)
-        v2 = str(successor)
-
-        if v1 not in self.list_adjacency or v2 not in self.list_adjacency:
-            raise ValueError("nodes does not exist")
-
-        for neighbor in self.list_adjacency[predecessor]:
-            if neighbor.name == successor:
-                return True
-        return False
-
     def thers_edge_adjacency(self, ed1: str, ed2: str):
         edge_name = str(ed1)
         edge2_name = str(ed2)
@@ -234,6 +237,27 @@ class GrafoLA:
         nodes_ed2 = self.edges_map[edge2_name]
 
         return any(v in nodes_ed2[:2] for v in nodes_ed1[:2])
+
+    def get_all_nodes_degree(self):
+        nodes_degree: Dict[str, int] = {}
+        for node_name in self.nodes_map.keys():
+            nodes_degree[node_name] = 0
+            size = len(self.list_adjacency)
+            for edge in self.edges_map.values():
+                if node_name in edge[:2]:
+                    nodes_degree[node_name] += 1
+        return nodes_degree
+
+    # endregion
+    # region Graph Section
+    def is_empty(self):
+        return len(self.list_adjacency) == 0
+
+    def get_edge_count(self):
+        return len(self.edges_map)
+
+    def get_node_count(self):
+        return len(self.list_adjacency)
 
     def is_complete(self):
 
@@ -255,47 +279,100 @@ class GrafoLA:
                 return False
         return True
 
-    def __writeNode(self, node: NodeLA):
-        result = f'<node id="{node.name}" label="{node.name}">\n'
-        result += "<attvalues>\n"
-        result += '<attvalue for="0" value="' + str(node.weight) + '"/>\n'
-        result += "</attvalues>\n"
-        result += "</node>\n"
+    def is_connected(self):
+        """
+        Check if the graph is connected.
+        Returns:
+            bool: True if the graph is connected, False otherwise.
+        """
+        if self.is_empty():
+            return True
 
-        return result
+        if self.DIRECTED:
+            graph = self.make_underlying_graph()
+            return graph.is_connected()
 
-    def __writeEdge(self, edge: str):
+        time = [0]
+        result: Dict[str, DFSNode] = {}
 
-        predecessor, successor, weight = self.edges_map[edge]
-        result = f"<edge label='{edge}' source='{predecessor}' target='{successor}' weight='{weight}'/>\n"
+        for node_name in self.nodes_map.keys():
+            result[str(node_name)] = DFSNode(0, 0, None)
 
-        return result
+        first_node = next(iter(self.nodes_map))
+        self._dfs(first_node, time, result)
 
-    def __writeGraph(self):
-        result = '<attributes class="node">\n'
-        result += '<attribute id="0" title="weight" type="float"/>\n'
-        result += "</attributes>\n"
-        result += "<nodes>\n"
-        for node in self.nodes_map.values():
-            result += self.__writeNode(node)
-        result += "</nodes>\n"
-        result += "<edges>\n"
-        for name in self.edges_map:
+        return time[0] == len(self.nodes_map) * 2
 
-            result += self.__writeEdge(name)
-        result += "</edges>\n"
-        return result
+    def _dfs(self, node_name, time, result):
+        node_name = str(node_name)
+        time[0] += 1
+        result[node_name].discovery_time = time[0]
 
-    def to_xml(self):
-        result = '<?xml version="1.0" encoding="UTF-8"?>\n'
-        result += '<gexf xmlns="http://gexf.net/1.3" xmlns:viz="http://gexf.net/1.3/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://gexf.net/1.3 http://gexf.net/1.3/gexf.xsd" version="1.3">\n'
-        result += f"<graph defaultedgetype=\"{'directed' if self.DIRECTED else 'undirected'}\">\n"
-        result += self.__writeGraph()
-        result += "</graph>\n"
-        result += "</gexf>\n"
+        for neighbor in self.list_adjacency[node_name]:
 
-        open("output/graphLA.gexf", "w").write(result)
+            if result[neighbor.name].discovery_time == 0:
+                result[neighbor.name].parent = node_name
+                self._dfs(neighbor.name, time, result)
 
+        time[0] += 1
+        result[node_name].finishing_time = time[0]
+
+    def get_euler_path(self):
+        """
+        Get the Euler Path of the graph.
+        Returns:
+            List[str]: A list with the nodes name of the Euler Path.
+        """
+        if self.is_empty():
+            return []
+
+        if not self.is_connected():
+            return []
+
+        if not self.is_simple():
+            raise ValueError("Graph is not simple")
+
+        if self.DIRECTED:
+            raise ValueError("Graph is directed")
+
+        euler_path: List[str] = []
+        copy_graph = copy.deepcopy(self)
+
+        nodes_degree = copy_graph.get_all_nodes_degree()
+        odd_degree_nodes = [
+            node for node, degree in nodes_degree.items() if degree % 2 != 0
+        ]
+
+        if len(odd_degree_nodes) >= 3:
+            return []
+
+        current_node = (
+            odd_degree_nodes[0] if odd_degree_nodes else next(iter(self.nodes_map))
+        )
+
+        while copy_graph.get_edge_count() > 0:
+            euler_path.append(current_node)
+            edges_of_current_node = copy_graph.get_edges_by_node(current_node)
+
+            if len(edges_of_current_node) == 1:
+                chosen_edge = edges_of_current_node[0]
+            else:
+                for edge_name in edges_of_current_node:
+                    if not copy_graph.is_bridget(edge_name):
+                        chosen_edge = edge_name
+                        break
+
+            v1, v2, _ = copy_graph.edges_map[chosen_edge]
+            copy_graph.remove_edge_by_name(chosen_edge)
+            current_node = v2 if v1 == current_node else v1
+
+        if copy_graph.get_edge_count() != 0:
+            raise ValueError("Graph has more than one connected component")
+
+        return euler_path
+
+    # endregion
+    # region Bridge and Articulation Section
     def get_bridge(self):
         """
         Get all bridge edges in the graph.
@@ -401,6 +478,8 @@ class GrafoLA:
 
         return excluded_edges
 
+    # endregion
+    # region Underlying Graph Section
     def make_underlying_graph(self):
 
         if not self.DIRECTED:
@@ -423,40 +502,78 @@ class GrafoLA:
         print("Underlying Graph")
         print(str(aux))
 
-    def is_connected(self):
-        """
-        Check if the graph is connected.
-        Returns:
-            bool: True if the graph is connected, False otherwise.
-        """
-        if self.is_empty():
-            return True
+    # endregion
+    # region xml to graph Section
+    def to_graph(self, path: str):
 
-        if self.DIRECTED:
-            graph = self.make_underlying_graph()
-            return graph.is_connected()
+        with open(path, "rb") as file:
+            xml = xmltodict.parse(file)
 
-        time = [0]
-        result: Dict[str, DFSNode] = {}
+        nodes = xml["gexf"]["graph"]["nodes"]["node"]
+        edges = xml["gexf"]["graph"]["edges"]["edge"]
+        self.DIRECTED = xml["gexf"]["graph"]["@defaultedgetype"] == "directed"
 
-        for node_name in self.nodes_map.keys():
-            result[str(node_name)] = DFSNode(0, 0, None)
+        for node in nodes:
+            self.add_node(node["@label"], node["attvalues"]["attvalue"]["@value"])
 
-        first_node = next(iter(self.nodes_map))
-        self._dfs(first_node, time, result)
+        if edges == None:
+            return self
+        print(len(edges))
+        if len(edges) == 4 and edges["@source"] != None:
+            edges = [edges]
 
-        return time[0] == len(self.nodes_map) * 2
+        for edge in edges:
+            for node in nodes:
+                if (edge["@source"]) == node["@id"]:
+                    source = node["@label"]
+                if edge["@target"] == node["@id"]:
+                    target = node["@label"]
 
-    def _dfs(self, node_name, time, result):
-        node_name = str(node_name)
-        time[0] += 1
-        result[node_name].discovery_time = time[0]
+            self.add_edge(source, target, edge["@weight"], edge["@label"])
+        return self
 
-        for neighbor in self.list_adjacency[node_name]:
+    # endregion
+    # region XML Section
 
-            if result[neighbor.name].discovery_time == 0:
-                result[neighbor.name].parent = node_name
-                self._dfs(neighbor.name, time, result)
+    def to_xml(self):
+        result = '<?xml version="1.0" encoding="UTF-8"?>\n'
+        result += '<gexf xmlns="http://gexf.net/1.3" xmlns:viz="http://gexf.net/1.3/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://gexf.net/1.3 http://gexf.net/1.3/gexf.xsd" version="1.3">\n'
+        result += f"<graph defaultedgetype=\"{'directed' if self.DIRECTED else 'undirected'}\">\n"
+        result += self.__writeGraph()
+        result += "</graph>\n"
+        result += "</gexf>\n"
 
-        time[0] += 1
-        result[node_name].finishing_time = time[0]
+        open("output/graphLA.gexf", "w").write(result)
+
+    def __writeGraph(self):
+        result = '<attributes class="node">\n'
+        result += '<attribute id="0" title="weight" type="float"/>\n'
+        result += "</attributes>\n"
+        result += "<nodes>\n"
+        for node in self.nodes_map.values():
+            result += self.__writeNode(node)
+        result += "</nodes>\n"
+        result += "<edges>\n"
+        for name in self.edges_map:
+
+            result += self.__writeEdge(name)
+        result += "</edges>\n"
+        return result
+
+    def __writeNode(self, node: NodeLA):
+        result = f'<node id="{node.name}" label="{node.name}">\n'
+        result += "<attvalues>\n"
+        result += '<attvalue for="0" value="' + str(node.weight) + '"/>\n'
+        result += "</attvalues>\n"
+        result += "</node>\n"
+
+        return result
+
+    def __writeEdge(self, edge: str):
+
+        predecessor, successor, weight = self.edges_map[edge]
+        result = f"<edge label='{edge}' source='{predecessor}' target='{successor}' weight='{weight}'/>\n"
+
+        return result
+
+    # endregion

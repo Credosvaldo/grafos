@@ -1,6 +1,6 @@
 import unittest
 from GrafoLA import GrafoLA
-from NodeLA import NodeLA
+from models.NodeLA import NodeLA
 
 class TestGrafoLA(unittest.TestCase):
 

@@ -1,10 +1,11 @@
 from typing import Dict, List, Tuple
-from DFSNode import DFSNode
-from Edge import Edge
-from ExcludedEdge import ExcludedEdge
-from Node import Node
+from models.DFSNode import DFSNode
+from models.Edge import Edge
+from models.ExcludedEdge import ExcludedEdge
+from models.Node import Node
 from datetime import datetime
 import copy
+import xmltodict
 
 
 class GrafoMA:
@@ -660,3 +661,31 @@ class GrafoMA:
         result += "</gexf>\n"
 
         open("output/graphMA.gexf", "w").write(result)
+
+    def to_graph(self, path: str):
+
+        with open(path, "rb") as file:
+            xml = xmltodict.parse(file)
+
+        nodes = xml["gexf"]["graph"]["nodes"]["node"]
+        edges = xml["gexf"]["graph"]["edges"]["edge"]
+        self.DIRECTED = xml["gexf"]["graph"]["@defaultedgetype"] == "directed"
+
+        for node in nodes:
+            self.add_node(node["@label"], node["attvalues"]["attvalue"]["@value"])
+
+        if edges == None:
+            return self
+        print(len(edges))
+        if len(edges) == 4 and edges["@source"] != None:
+            edges = [edges]
+
+        for edge in edges:
+            for node in nodes:
+                if (edge["@source"]) == node["@id"]:
+                    source = node["@label"]
+                if edge["@target"] == node["@id"]:
+                    target = node["@label"]
+
+            self.add_edge(source, target, edge["@weight"], edge["@label"])
+        return self
