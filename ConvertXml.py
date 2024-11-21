@@ -1,3 +1,4 @@
+from Grafo import GrafoMA
 from GrafoLA import GrafoLA
 from GraphType import GraphType
 import xmltodict
@@ -30,7 +31,45 @@ class ConvertXml:
     def __basedInMatrixAdjacency(self, graph):
         pass
 
-    def toGraph(self, path: str):
+    def to_graph(self, graphType: GraphType, path: str):
+        if graphType == GraphType.LIST_ADJACENCY:
+            return self.__toListAdjacency(path)
+        elif graphType == GraphType.MATRIX_INCIDENCE:
+            pass
+        elif graphType == GraphType.MATRIX_ADJACENCY:
+            return self.__toMatrixAdjacency(path)
+        else:
+            raise ValueError("Invalid GraphType")
+
+    def __toMatrixAdjacency(self, path: str):
+        with open(path, "rb") as file:
+            self.xml = xmltodict.parse(file)
+
+        nodes = self.xml["gexf"]["graph"]["nodes"]["node"]
+        edges = self.xml["gexf"]["graph"]["edges"]["edge"]
+        directed = self.xml["gexf"]["graph"]["@defaultedgetype"] == "directed"
+        graph = GrafoMA(DIRECTED=directed)
+
+        for node in nodes:
+            graph.add_node(node["@label"], node["attvalues"]["attvalue"]["@value"])
+
+        if edges == None:
+            return graph
+        print(len(edges))
+        if len(edges) == 4 and edges["@source"] != None:
+            edges = [edges]
+
+        for edge in edges:
+            for node in nodes:
+                if (edge["@source"]) == node["@id"]:
+                    source = node["@label"]
+                if edge["@target"] == node["@id"]:
+                    target = node["@label"]
+
+            graph.add_edge(source, target, edge["@weight"], edge["@label"])
+        return graph
+
+    def __toListAdjacency(self, path: str):
         with open(path, "rb") as file:
             self.xml = xmltodict.parse(file)
 

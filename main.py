@@ -1,6 +1,8 @@
+from ConvertXml import ConvertXml
 from DFSNode import DFSNode
 from Grafo import GrafoMA
 from GrafoLA import GrafoLA
+from GraphType import GraphType
 
 a = GrafoMA(DIRECTED=False)
 
@@ -33,9 +35,17 @@ print(b)
 print(b.thers_edge_by_nodes("1", "2"))
 print(b.is_empty())
 print(b.get_edge_count())
-print(b.isComplete())
+print(b.is_complete())
 print(b.is_simple())
 
-c  = GrafoLA(DIRECTED=True, num_nodes=12)
+c = GrafoLA(DIRECTED=True, num_nodes=12)
 
 print(c.is_simple())
+
+d = ConvertXml().to_graph(graphType=GraphType.MATRIX_ADJACENCY, path="graph.gexf")
+
+print(d)
+
+d = ConvertXml().to_graph(graphType=GraphType.LIST_ADJACENCY, path="graph.gexf")
+
+print(d)
