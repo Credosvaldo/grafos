@@ -45,7 +45,7 @@ class GrafoLA:
                 name = str(name)
                 self.add_node(name, 0)
 
-    def add_node(self, name: str, weight: float):
+    def add_node(self, name: str, weight: float = 0):
         """
         Adds a new node to the graph.
 
@@ -57,6 +57,7 @@ class GrafoLA:
         ValueError: If a node with the given name already exists in the graph.
         """
         if name not in self.nodes_map:
+            name = str(name)
             self.list_adjacency[name] = []
             self.nodes_map[name] = NodeLA(weight, name)
         else:
@@ -86,7 +87,9 @@ class GrafoLA:
             raise ValueError("NodeLA name not found")
 
     # Check loop e parallel edge
-    def add_edge(self, predecessor: str, successor: str, weight: float, name: str):
+    def add_edge(
+        self, predecessor: str, successor: str, weight: float, name: str = None
+    ):
         """
         Adds an edge to the graph.
         Parameters:
@@ -97,6 +100,8 @@ class GrafoLA:
         Returns:
         None
         """
+        predecessor = str(predecessor)
+        successor = str(successor)
 
         if predecessor not in self.list_adjacency:
             self.add_node(predecessor, None)
@@ -106,6 +111,13 @@ class GrafoLA:
         if name in self.edges_map:
             raise ValueError("Edge already exist")
 
+        new_edge_name = len(self.edges_map) + 1
+
+        while name is None or name in self.edges_map:
+            name = str(new_edge_name)
+            new_edge_name += 1
+
+        name = str(name)
         self.list_adjacency[predecessor].append(self.nodes_map[successor])
 
         if not self.DIRECTED and predecessor != successor:
@@ -113,7 +125,7 @@ class GrafoLA:
 
         self.edges_map[name] = (predecessor, successor, weight)
 
-    def remove_edge(self, name: str):
+    def remove_edge_by_name(self, name: str):
         """
         Removes an edge from the graph.
 
@@ -244,7 +256,7 @@ class GrafoLA:
         return True
 
     def __writeNode(self, node: NodeLA):
-        result = '<node id="' + node.name + '" label="' + node.name + '">\n'
+        result = f'<node id="{node.name}" label="{node.name}">\n'
         result += "<attvalues>\n"
         result += '<attvalue for="0" value="' + str(node.weight) + '"/>\n'
         result += "</attvalues>\n"
@@ -283,3 +295,172 @@ class GrafoLA:
         result += "</gexf>\n"
 
         open("output/graphLA.gexf", "w").write(result)
+
+    def get_bridge(self):
+        """
+        Get all bridge edges in the graph.
+        Returns:
+            List[Edges]: A list with all bridge edges name.
+        """
+        if self.is_empty():
+            return []
+
+        bridges: List[str] = []
+        copy_graph = (
+            self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
+        )
+
+        for edge_name, edge_nodes in self.edges_map.items():
+            copy_graph.remove_edge_by_name(edge_name)
+            if not copy_graph.is_connected():
+                bridges.append(edge_name)
+            copy_graph.add_edge(edge_nodes[0], edge_nodes[1], 1, edge_name)
+
+        return bridges
+
+    def is_bridget(self, edge_name: str):
+        """
+        Check if the given edge is a bridge.
+        Args:
+            edge_name (str): The edge name.
+        Returns:
+            bool: True if the edge is a bridge, False otherwise.
+        """
+        edge_name = str(edge_name)
+
+        if edge_name not in self.edges_map:
+            raise ValueError("Edge name does not exist")
+
+        copy_graph = (
+            self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
+        )
+        copy_graph.remove_edge_by_name(edge_name)
+
+        is_bridge = not copy_graph.is_connected()
+
+        return is_bridge
+
+    def get_articulations(self):
+
+        if self.is_empty():
+            return []
+
+        articulations: List[str] = []
+        excluded_edges: List[ExcludedEdge] = []
+
+        copy_graph = (
+            self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
+        )
+
+        for node_name in self.nodes_map.keys():
+            excluded_edges = copy_graph._get_excluded_edges_by_node(node_name)
+            copy_graph.remove_node(node_name)
+
+            if not copy_graph.is_connected():
+                articulations.append(node_name)
+
+            copy_graph.add_node(node_name)
+            for excluded_edge in excluded_edges:
+                copy_graph.add_edge(
+                    excluded_edge.v1, excluded_edge.v2, 1, excluded_edge.name
+                )
+
+        return articulations
+
+    def is_articulation(self, node_name: str):
+        """
+        Check if the given node is an articulation.
+        Args:
+            node_name (str): The node name.
+        Returns:
+            bool: True if the node is an articulation, False otherwise.
+        """
+        node_name = str(node_name)
+
+        if node_name not in self.nodes_map:
+            raise ValueError("Node name does not exist")
+
+        copy_graph = (
+            self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
+        )
+        copy_graph.remove_node(node_name)
+
+        is_articulation = not copy_graph.is_connected()
+
+        return is_articulation
+
+    def _get_excluded_edges_by_node(self, node: str):
+        node = str(node)
+        edges_name = [
+            edge.name
+            for sublist in self.matrix_adjacency[self.nodes_map[node].index]
+            for edge in sublist
+        ]
+        excluded_edges = []
+        for name in edges_name:
+            excluded = ExcludedEdge(
+                name, self.edges_map[name][0], self.edges_map[name][1]
+            )
+            excluded_edges.append(excluded)
+
+        return excluded_edges
+
+    def make_underlying_graph(self):
+
+        if not self.DIRECTED:
+            raise ValueError("Graph is not directed")
+
+        new_graph = GrafoLA(False)
+        size = len(self.list_adjacency)
+
+        for node in self.nodes_map.values():
+            new_graph.add_node(node.name, node.weight)
+
+        for edge_name in self.edges_map:
+            predecessor, successor, weight = self.edges_map[edge_name]
+            new_graph.add_edge(predecessor, successor, weight, edge_name)
+
+        return new_graph
+
+    def print_underlying_graph(self):
+        aux = self.make_underlying_graph()
+        print("Underlying Graph")
+        print(str(aux))
+
+    def is_connected(self):
+        """
+        Check if the graph is connected.
+        Returns:
+            bool: True if the graph is connected, False otherwise.
+        """
+        if self.is_empty():
+            return True
+
+        if self.DIRECTED:
+            graph = self.make_underlying_graph()
+            return graph.is_connected()
+
+        time = [0]
+        result: Dict[str, DFSNode] = {}
+
+        for node_name in self.nodes_map.keys():
+            result[str(node_name)] = DFSNode(0, 0, None)
+
+        first_node = next(iter(self.nodes_map))
+        self._dfs(first_node, time, result)
+
+        return time[0] == len(self.nodes_map) * 2
+
+    def _dfs(self, node_name, time, result):
+        node_name = str(node_name)
+        time[0] += 1
+        result[node_name].discovery_time = time[0]
+
+        for neighbor in self.list_adjacency[node_name]:
+
+            if result[neighbor.name].discovery_time == 0:
+                result[neighbor.name].parent = node_name
+                self._dfs(neighbor.name, time, result)
+
+        time[0] += 1
+        result[node_name].finishing_time = time[0]
