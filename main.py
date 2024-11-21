@@ -1,6 +1,6 @@
 from ConvertXml import ConvertXml
 from DFSNode import DFSNode
-from Grafo import GrafoMA
+from GrafoMA import GrafoMA
 from GrafoLA import GrafoLA
 from GraphType import GraphType
 
@@ -11,6 +11,7 @@ a.add_edge(3, 2, 8)
 a.add_edge(3, 1, 9)
 
 
+a.to_xml()
 euler_path = a.get_euler_path()
 print(euler_path)
 print(a)
@@ -39,13 +40,13 @@ print(b.is_complete())
 print(b.is_simple())
 
 c = GrafoLA(DIRECTED=True, num_nodes=12)
+b.to_xml()
+# print(c.is_simple())
 
-print(c.is_simple())
+# d = ConvertXml().to_graph(graphType=GraphType.MATRIX_ADJACENCY, path="graph.gexf")
 
-d = ConvertXml().to_graph(graphType=GraphType.MATRIX_ADJACENCY, path="graph.gexf")
+# print(d)
 
-print(d)
+# d = ConvertXml().to_graph(graphType=GraphType.LIST_ADJACENCY, path="graph.gexf")
 
-d = ConvertXml().to_graph(graphType=GraphType.LIST_ADJACENCY, path="graph.gexf")
-
-print(d)
+# print(d)

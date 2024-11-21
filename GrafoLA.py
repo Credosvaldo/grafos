@@ -242,3 +242,44 @@ class GrafoLA:
             if aux.count(self.nodes_map[node_key]) > 0:
                 return False
         return True
+
+    def __writeNode(self, node: NodeLA):
+        result = '<node id="' + node.name + '" label="' + node.name + '">\n'
+        result += "<attvalues>\n"
+        result += '<attvalue for="0" value="' + str(node.weight) + '"/>\n'
+        result += "</attvalues>\n"
+        result += "</node>\n"
+
+        return result
+
+    def __writeEdge(self, edge: str):
+
+        predecessor, successor, weight = self.edges_map[edge]
+        result = f"<edge label='{edge}' source='{predecessor}' target='{successor}' weight='{weight}'/>\n"
+
+        return result
+
+    def __writeGraph(self):
+        result = '<attributes class="node">\n'
+        result += '<attribute id="0" title="weight" type="float"/>\n'
+        result += "</attributes>\n"
+        result += "<nodes>\n"
+        for node in self.nodes_map.values():
+            result += self.__writeNode(node)
+        result += "</nodes>\n"
+        result += "<edges>\n"
+        for name in self.edges_map:
+
+            result += self.__writeEdge(name)
+        result += "</edges>\n"
+        return result
+
+    def to_xml(self):
+        result = '<?xml version="1.0" encoding="UTF-8"?>\n'
+        result += '<gexf xmlns="http://gexf.net/1.3" xmlns:viz="http://gexf.net/1.3/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://gexf.net/1.3 http://gexf.net/1.3/gexf.xsd" version="1.3">\n'
+        result += f"<graph defaultedgetype=\"{'directed' if self.DIRECTED else 'undirected'}\">\n"
+        result += self.__writeGraph()
+        result += "</graph>\n"
+        result += "</gexf>\n"
+
+        open("output/graphLA.gexf", "w").write(result)
