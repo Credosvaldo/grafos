@@ -16,7 +16,9 @@ class GrafoLA:
     ):
 
         self.nodes_map: Dict[str, NodeLA] = {}
-        self.edges_map: Dict[str, Tuple[str, str, float]] = {}
+        self.edges_map: Dict[str, Tuple[str, str, float]] = (
+            {}
+        )  # predecessor , successor, weight
         self.DIRECTED = DIRECTED
         self.list_adjacency: Dict[str, List[NodeLA]] = {}
         self.create_adjacency_list(num_nodes, nodes)
@@ -101,6 +103,9 @@ class GrafoLA:
         if successor not in self.list_adjacency:
             self.add_node(successor, None)
 
+        if name in self.edges_map:
+            raise ValueError("Edge already exist")
+
         self.list_adjacency[predecessor].append(self.nodes_map[successor])
 
         if not self.DIRECTED and predecessor != successor:
@@ -151,8 +156,10 @@ class GrafoLA:
 
         This method removes all edges between the predecessor and successor nodes from the graph.
         """
-        for edge in list(self.edges_map.keys()):
-            v1, v2, _ = edge  # _ is the weight of the edge that we are not using
+        for key in self.edges_map:
+            v1, v2, _ = self.edges_map[
+                key
+            ]  # _ is the weight of the edge that we are not using
             if v1 == predecessor and v2 == successor:
                 self.remove_edge(edge)
 
@@ -174,9 +181,64 @@ class GrafoLA:
 
     def thers_edge_by_nodes(self, predecessor: str, successor: str):
 
-        for edge in self.edges_map:
-            v1, v2, _ = edge  # _ is the weight of the edge that we are not using
+        for key in self.edges_map:
+            v1, v2, _ = self.edges_map[
+                key
+            ]  # _ is the weight of the edge that we are not using
             if v1 == predecessor and v2 == successor:
                 return True
 
         return False
+
+    def is_empty(self):
+        return len(self.list_adjacency) == 0
+
+    def get_edge_count(self):
+        return len(self.edges_map)
+
+    def get_node_count(self):
+        return len(self.list_adjacency)
+
+    def thers_node_adjacency(self, predecessor: str, successor: str):
+        v1 = str(predecessor)
+        v2 = str(successor)
+
+        if v1 not in self.list_adjacency or v2 not in self.list_adjacency:
+            raise ValueError("nodes does not exist")
+
+        for neighbor in self.list_adjacency[predecessor]:
+            if neighbor.name == successor:
+                return True
+        return False
+
+    def thers_edge_adjacency(self, ed1: str, ed2: str):
+        edge_name = str(ed1)
+        edge2_name = str(ed2)
+
+        if edge_name not in self.edges_map or edge2_name not in self.edges_map:
+            raise ValueError("edges does not exist")
+
+        nodes_ed1 = self.edges_map[edge_name]
+        nodes_ed2 = self.edges_map[edge2_name]
+
+        return any(v in nodes_ed2[:2] for v in nodes_ed1[:2])
+
+    def is_complete(self):
+
+        for node_key in self.list_adjacency:
+            aux = self.list_adjacency[node_key]
+
+            for key in self.nodes_map:
+
+                if aux.count(self.nodes_map[key]) == 0 and node_key != key:
+                    return False
+
+        return True
+
+    def is_simple(self):
+        for node_key in self.list_adjacency:
+            aux = self.list_adjacency[node_key]
+
+            if aux.count(self.nodes_map[node_key]) > 0:
+                return False
+        return True
