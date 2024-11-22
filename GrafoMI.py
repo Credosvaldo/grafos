@@ -240,4 +240,20 @@ class GrafoMI:
                         return True
         return False
     
+    def theres_edge_adjacente(self, edge1: str, edge2: str):
+        if edge1 not in self.edges_map or edge2 not in self.edges_map:
+            raise ValueError("Edge does not exist")
+        
+        v1, v2, edge1_index = self.edges_map[edge1]
+        v3, v4, edge2_index = self.edges_map[edge2]
+        
+        # A aresta vai ser adjancete se ela tiver um nó em comum
+        # no caso do grafo direcionado, o nó comum tem que ser no destino/origem
+        if self.DIRECTED:
+            return v2 == v3
+        else:
+            # no grafo não direcionado se qualquer um dos vertices for igual é adj
+            return v2 == v3 or v2 == v4 or v1 == v3 or v1 == v4
+    
+    
     
