@@ -87,6 +87,7 @@ class GrafoLA:
         It also removes any edges in other nodes' adjacency lists that point to the removed node.
         """
         if name in self.nodes_map:
+            self.remove_all_edge_by_node(name)
             self.nodes_map.pop(name)
             self.list_adjacency.pop(name)
             for node in self.list_adjacency:
@@ -190,6 +191,20 @@ class GrafoLA:
             self.edges_map.pop(name)
         else:
             raise ValueError("Edge name not found")
+
+    def remove_all_edge_by_node(self, node_name: str):
+        """
+        Removes all edges associated with a node from the graph.
+
+        Args:
+            node_name (str): The name of the node whose edges will be removed.
+
+        This method removes all edges that are adjacent to the specified node from the graph.
+        """
+        for key in list(self.edges_map.keys()):
+            v1, v2, _ = self.edges_map[key]
+            if v1 == node_name or v2 == node_name:
+                self.remove_edge_by_name(key)
 
     def remove_all_edge_by_nodes(self, predecessor: str, successor: str):
         """

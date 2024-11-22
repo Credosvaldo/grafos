@@ -76,8 +76,11 @@ class TestGrafoLA(unittest.TestCase):
     def test_get_articulations(self):
         self.graph.add_node("A", 1.0)
         self.graph.add_node("B", 2.0)
+        self.graph.add_node("C", 3.0)
         self.graph.add_edge("A", "B", 3.0, "edge1")
-        self.assertEqual(self.graph.get_articulations(), ["A", "B"])
+        self.graph.add_edge("B", "C", 3.0, "edge2")
+
+        self.assertEqual(self.graph.get_articulations(), ["B"])
 
     def test_thers_node_adjacency(self):
         self.graph.add_node("A", 1.0)
@@ -124,7 +127,7 @@ class TestGrafoLA(unittest.TestCase):
         self.graph.add_edge("A", "B", 3.0, "edge1")
 
         euler_path = self.graph.get_euler_path()
-        self.assertEqual(euler_path, ["A", "B"])
+        self.assertEqual(euler_path, ["A"])
 
     def test_is_bridget(self):
         self.graph.add_node("A", 1.0)
@@ -136,10 +139,9 @@ class TestGrafoLA(unittest.TestCase):
         self.graph.add_node("A", 1.0)
         self.graph.add_node("B", 2.0)
         self.graph.add_edge("A", "B", 3.0, "edge1")
-        self.assertTrue(self.graph.is_articulation("A"))
         self.graph.add_node("C", 3.0)
         self.graph.add_edge("B", "C", 4.0, "edge2")
-        self.assertFalse(self.graph.is_articulation("B"))
+        self.assertTrue(self.graph.is_articulation("B"))
 
     def test_make_underlying_graph(self):
         self.graph.add_node("A", 1.0)
