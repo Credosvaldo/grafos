@@ -15,43 +15,33 @@ class GrafoMI:
             self.nodes_map: Dict[str, Node] = {} # associando o nome do nó com o nó 
             self.edges_map: Dict[str, Tuple[str, str, int]] = {} # associando o nome da aresta com o nome dos nós na ponta e o indice da aresta (ou seja, qual coluna ela representa)
             self.DIRECTED = DIRECTED # Direcionado ou não
-            self.excluded_nodes_index = [] # para não ter que apagar uma linha da matriz
-            self.excluded_edges_intex = [] # para não ter que apagar uma coluna da matriz
-            
             
     def __str__(self) -> str:
-        # Header com o nome das arestas (ignorando as que foram excluídas)
-        edge_names = [
-            name for name, (_, _, index) in self.edges_map.items()
-            if index not in self.excluded_edges_intex
-        ]
-        edge_header = "    " + " ".join([f"{name:>5}" for name in edge_names]) + "\n"  # 5 caracteres por nome e alinhado para a direita
+        # Header with the names of the edges
+        edge_names = [name for name in self.edges_map.keys()]
+        edge_header = "    " + " ".join([f"{name:>5}" for name in edge_names]) + "\n"  # 5 characters per name, right-aligned
 
-        # Corpo da matriz com os nós e pesos das arestas (ignorando os que foram excluídos)
+        # Body of the matrix with nodes and edge weights
         matrix_rows = []
-        for i, row in enumerate(self.matrix_incidency):  # Iterar sobre cada linha da matriz -> i é o indice da linha e row é a linha
-            if i in self.excluded_nodes_index:  # Ignorar nós excluídos
-                continue
-            
-            node_name = list(self.nodes_map.keys())[i] 
-            row_str = f"{node_name:<3} " + " ".join(  # Nome do nó seguido pelo peso de cada aresta
+        for node_name, node in self.nodes_map.items():
+            node_index = node.index
+            row_str = f"{node_name:<3} " + " ".join(  # Node name followed by weights of each edge
                 [
-                    f"{cell.weight:>5}" if cell and col_idx not in self.excluded_edges_intex else f"{'0':>5}"
-                    for col_idx, cell in enumerate(row)  # Iterar sobre cada célula da linha -> col_idx é o indice da coluna e cell é a célula
-                    # celula é do tipo Edge
+                    f"{cell.weight:>5}" if cell else f"{'0':>5}"
+                    for cell in self.matrix_incidency[node_index]
                 ]
             )
             matrix_rows.append(row_str)
-        
-        # Corrected subtitle for node weights
+
+        # Subtitle for node weights
         subtitle_for_node_weights = "Legenda (Peso dos nós):\n" + "\n".join(
             [
                 f"{node_name}: {node.weight}"
                 for node_name, node in self.nodes_map.items()
             ]
         )
-        
-        # Construindo a matriz final
+
+        # Building the final matrix
         result = "Matriz de Incidência:\n"
         result += edge_header
         result += "\n".join(matrix_rows)
@@ -116,8 +106,13 @@ class GrafoMI:
             raise ValueError("Edge name does not exist")
         
         _, _, edge_index = self.edges_map[name] # Pegando o índice da aresta
-        self.excluded_edges_intex.append(edge_index) # Adicionando na lista de excluidos para não ter que refazer a matriz
-        del self.edges_map[name] # apagando do mapeamento de arestas
+        # Remove a aresta da matriz de incidência (ou seja, apaga a coluna de cada linha) 
+        for row in self.matrix_incidency:
+            row.pop(edge_index)
+        
+        del self.edges_map[name]  # remove a aresta do mapeamento de arestas
+        
+        self._recreate_matrix()
         
     #Remove todas as arestas entre dois nós
     def remove_all_edges_by_nodes(self, predecessor: str, sucessor: str):
@@ -130,14 +125,34 @@ class GrafoMI:
         v1_index = self.nodes_map[v1].index
         v2_index = self.nodes_map[v2].index
         
-        # Iterando sobre as arestas
+        # Guarda todas as arestas que devem ser excluidas
+        edges_to_remove = []
         for edge_index, edge in enumerate(self.matrix_incidency[v1_index]):
-            # Se a aresta já não foi excluida...
-            if edge and edge_index not in self.excluded_edges_intex:
-                if self.matrix_incidency[v2_index][edge_index] and edge_index not in self.excluded_edges_intex:
-                    # Excluindo a aresta
-                    self.excluded_edges_intex.append(edge_index)
-                    del self.edges_map[edge.name]
+            # Verifica se há uma aresta entre v1 e v2 em qualquer direção
+            if edge and (
+                self.matrix_incidency[v2_index][edge_index] or  # (v1, v2)
+                self.matrix_incidency[v1_index][edge_index]    # (v2, v1) - redundante, mas garante robustez
+            ):
+                edges_to_remove.append(edge_index)
+        
+        # Remove todas as arestas de tras pra frente para que o index das arestas não mude
+        for edge_index in sorted(edges_to_remove, reverse=True):
+            # Remove a coluna da matriz de incidência
+            for row in self.matrix_incidency:
+                row.pop(edge_index)
+                
+            # Encontra a chave no edges_map considerando ambas as direções
+            edge_name = None
+            for key, value in self.edges_map.items():
+                if (value[0] == v1 and value[1] == v2 and value[2] == edge_index) or \
+                (value[0] == v2 and value[1] == v1 and value[2] == edge_index):
+                    edge_name = key
+                    break
+            
+            if edge_name is not None:
+                del self.edges_map[edge_name]
+        
+        self._recreate_matrix()
 
     def add_node(self, name: str, weight: float = 1):
         if name in self.nodes_map:
@@ -158,12 +173,66 @@ class GrafoMI:
             raise ValueError("Node name does not exist")
         
         node_index = self.nodes_map[name].index
-        self.excluded_nodes_index.append(node_index)
         
-        # Excluindo todas as arestas do nó
-        for edge_index, edge in enumerate(self.matrix_incidency[node_index]):
-            if edge and edge_index not in self.excluded_edges_intex:
-                self.excluded_edges_intex.append(edge_index)
-                del self.edges_map[edge.name]
+        # remove a linha da matrix
+        self.matrix_incidency.pop(node_index)
+        
+        # remove todas as arestas que estavam conectadas ao ní
+        edges_to_remove = []
+        for edge_index, edge in enumerate(self.matrix_incidency[node_index] if self.matrix_incidency else []):
+            if edge:
+                edges_to_remove.append(edge_index)
+        
+        # Remove todas as arestas de trás pra frente para que o index das arestas não mude
+        for edge_index in sorted(edges_to_remove, reverse=True):
+            for row in self.matrix_incidency:
+                row.pop(edge_index)
+            
+            # Agora buscamos as arestas no edges_map, considerando as duas direções
+            # Ou seja, buscamos no edge_name um valor que tenha o edge_index e o nome do nó como origem ou destino
+            edge_name = None
+            for key, value in self.edges_map.items():
+                if (value[0] == name and value[2] == edge_index) or (value[1] == name and value[2] == edge_index):
+                    edge_name = key
+                    break
+            
+            if edge_name is not None:
+                del self.edges_map[edge_name]
         
         del self.nodes_map[name]
+        
+        self._recreate_matrix()
+        
+    def _recreate_matrix(self):
+        # Atualiza os índices dos nós e das arestas após a remoção
+        for i, (node_name, node) in enumerate(self.nodes_map.items()):
+            node.index = i
+
+        for j, edge_name in enumerate(self.edges_map.keys()):
+            self.edges_map[edge_name] = (
+                self.edges_map[edge_name][0], 
+                self.edges_map[edge_name][1], 
+                j
+            )
+        
+    def thers_node_adjacente(self, predecessor: str, sucessor: str):
+        v1 = str(predecessor)
+        v2 = str(sucessor)
+        
+        if v1 not in self.nodes_map or v2 not in self.nodes_map:
+            raise ValueError("Node does not exist")
+        
+        # Index dos nós sendo avaliados
+        v1_index = self.nodes_map[v1].index
+        v2_index = self.nodes_map[v2].index
+        
+        # para cada aresta que liga v1
+        for edge_index, edge in enumerate(self.matrix_incidency[v1_index]):
+            # se existe uma aresta que ainda não foi excluida
+            if edge and edge_index not in self.excluded_edges_intex:
+                # e essa aresta liga v2
+                if self.matrix_incidency[v2_index][edge_index] and edge_index not in self.excluded_edges_intex:
+                    return True
+        return False
+    
+    
