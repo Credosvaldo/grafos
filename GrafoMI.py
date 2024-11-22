@@ -132,8 +132,10 @@ class GrafoMI:
         
         # Iterando sobre as arestas
         for edge_index, edge in enumerate(self.matrix_incidency[v1_index]):
+            # Se a aresta já não foi excluida...
             if edge and edge_index not in self.excluded_edges_intex:
                 if self.matrix_incidency[v2_index][edge_index] and edge_index not in self.excluded_edges_intex:
+                    # Excluindo a aresta
                     self.excluded_edges_intex.append(edge_index)
                     del self.edges_map[edge.name]
 
@@ -148,3 +150,20 @@ class GrafoMI:
         num_columns = len(self.matrix_incidency[0]) if self.matrix_incidency else 0
         # Adicionando uma linha nova à matriz
         self.matrix_incidency.append([None for _ in range(num_columns)])
+        
+    def remove_node(self, name: str):
+        name = str(name)
+        
+        if name not in self.nodes_map:
+            raise ValueError("Node name does not exist")
+        
+        node_index = self.nodes_map[name].index
+        self.excluded_nodes_index.append(node_index)
+        
+        # Excluindo todas as arestas do nó
+        for edge_index, edge in enumerate(self.matrix_incidency[node_index]):
+            if edge and edge_index not in self.excluded_edges_intex:
+                self.excluded_edges_intex.append(edge_index)
+                del self.edges_map[edge.name]
+        
+        del self.nodes_map[name]
