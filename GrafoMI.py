@@ -255,5 +255,7 @@ class GrafoMI:
             # no grafo não direcionado se qualquer um dos vertices for igual é adj
             return v2 == v3 or v2 == v4 or v1 == v3 or v1 == v4
     
+    def thers_edge_by_name(self, name: str):
+        return str(name) in self.edges_map
     
     
