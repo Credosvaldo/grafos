@@ -258,4 +258,28 @@ class GrafoMI:
     def thers_edge_by_name(self, name: str):
         return str(name) in self.edges_map
     
+    def thers_edge_by_nodes(self, predecessor: str, sucessor: str):
+        v1 = str(predecessor)
+        v2 = str(sucessor)
+        
+        if v1 not in self.nodes_map or v2 not in self.nodes_map:
+            raise ValueError("Node does not exist")
+        
+        v1_index = self.nodes_map[v1].index
+        v2_index = self.nodes_map[v2].index
+        
+        # Para cada coluna (ou seja, para cada aresta)
+        for edge_index, edge in enumerate(self.matrix_incidency[v1_index]):
+            # se a aresta existir na linha do v1 (ou seja, a matrix[linha][coluna] != None)
+            if edge:
+                # se o grafo for direcionado a aresta tem que sair do predecessor e ir pro sucessor
+                # ou seja, o peso tem que ser negativo e a coluna tem que existir no sucessor
+                if self.DIRECTED:
+                    if edge.weight < 0 and self.matrix_incidency[v2_index][edge_index]:
+                        return True
+                else:
+                    # se for não direcionado, basta que a aresta ligue os dois nós
+                    if self.matrix_incidency[v2_index][edge_index]:
+                        return True
+        return False
     
