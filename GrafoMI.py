@@ -13,7 +13,7 @@ class GrafoMI:
         ):
             self.matrix_incidency: List[List[Edge]] = self._create_matrix(num_nodes) # eixo X são as arestas e o eixo Y são os vertices
             self.nodes_map: Dict[str, Node] = {} # associando o nome do nó com o nó 
-            self.edges_map: Dict[str, Tuple[str, str, int]] # associando o nome da aresta com o nome dos nós na ponta e o indice da aresta (ou seja, qual coluna ela representa)
+            self.edges_map: Dict[str, Tuple[str, str, int]] = {} # associando o nome da aresta com o nome dos nós na ponta e o indice da aresta (ou seja, qual coluna ela representa)
             self.DIRECTED = DIRECTED # Direcionado ou não
             self.excluded_nodes_index = [] # para não ter que apagar uma linha da matriz
             self.excluded_edges_intex = [] # para não ter que apagar uma coluna da matriz
@@ -29,7 +29,7 @@ class GrafoMI:
 
         # Corpo da matriz com os nós e pesos das arestas (ignorando os que foram excluídos)
         matrix_rows = []
-        for i, row in enumerate(self.matrix_incidency): # Iterar sobre cada linha da matriz -> i é o indice da linha e row é a linha
+        for i, row in enumerate(self.matrix_incidency):  # Iterar sobre cada linha da matriz -> i é o indice da linha e row é a linha
             if i in self.excluded_nodes_index:  # Ignorar nós excluídos
                 continue
             
@@ -37,19 +37,20 @@ class GrafoMI:
             row_str = f"{node_name:<3} " + " ".join(  # Nome do nó seguido pelo peso de cada aresta
                 [
                     f"{cell.weight:>5}" if cell and col_idx not in self.excluded_edges_intex else f"{'0':>5}"
-                    for col_idx, cell in enumerate(row) # Iterar sobre cada célula da linha -> col_idx é o indice da coluna e cell é a célula
+                    for col_idx, cell in enumerate(row)  # Iterar sobre cada célula da linha -> col_idx é o indice da coluna e cell é a célula
                     # celula é do tipo Edge
                 ]
             )
             matrix_rows.append(row_str)
-            
         
-        subtitle_for_node_weights = "Legenda (Peso dos nós):\n".join(
+        # Corrected subtitle for node weights
+        subtitle_for_node_weights = "Legenda (Peso dos nós):\n" + "\n".join(
             [
-                f"{node_name}: {node_weight}"
-                for node_name, node_weight in self.nodes_map.items()
+                f"{node_name}: {node.weight}"
+                for node_name, node in self.nodes_map.items()
             ]
         )
+        
         # Construindo a matriz final
         result = "Matriz de Incidência:\n"
         result += edge_header
@@ -68,10 +69,12 @@ class GrafoMI:
             raise ValueError(f"Já existe uma aresta com o nome {name}")
         
         # se não tiver nome, criamos um
-        new_edge_name = len(self.edges_map) + 1 
+        i = 1
+        new_edge_name = f"e{len(self.edges_map) + i}"
         while name is None or name in self.edges_map:
             name = str(new_edge_name)
-            new_edge_name += 1
+            i += 1
+            new_edge_name = f"e{len(self.edges_map) + 1}"
         
         name = str(name)
         
@@ -116,6 +119,23 @@ class GrafoMI:
         self.excluded_edges_intex.append(edge_index) # Adicionando na lista de excluidos para não ter que refazer a matriz
         del self.edges_map[name] # apagando do mapeamento de arestas
         
+    #Remove todas as arestas entre dois nós
+    def remove_all_edges_by_nodes(self, predecessor: str, sucessor: str):
+        v1 = str(predecessor)
+        v2 = str(sucessor)
+        
+        if v1 not in self.nodes_map or v2 not in self.nodes_map:
+            raise ValueError("Node does not exist")
+        
+        v1_index = self.nodes_map[v1].index
+        v2_index = self.nodes_map[v2].index
+        
+        # Iterando sobre as arestas
+        for edge_index, edge in enumerate(self.matrix_incidency[v1_index]):
+            if edge and edge_index not in self.excluded_edges_intex:
+                if self.matrix_incidency[v2_index][edge_index] and edge_index not in self.excluded_edges_intex:
+                    self.excluded_edges_intex.append(edge_index)
+                    del self.edges_map[edge.name]
 
     def add_node(self, name: str, weight: float = 1):
         if name in self.nodes_map:
@@ -124,5 +144,7 @@ class GrafoMI:
         new_node_index = len(self.nodes_map)
         self.nodes_map[name] = Node(index=new_node_index, weight=weight)
         
+        # Verificando se há colunas suficientes na matriz para adicionar o novo nó
+        num_columns = len(self.matrix_incidency[0]) if self.matrix_incidency else 0
         # Adicionando uma linha nova à matriz
-        self.matrix_incidency.append([None for _ in range(len(self.matrix_incidency[0]))])
+        self.matrix_incidency.append([None for _ in range(num_columns)])

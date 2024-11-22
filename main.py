@@ -14,15 +14,17 @@ d.add_edge(1, 2, 7)
 d.add_edge(3, 2, 8)
 d.add_edge(3, 1, 9)
 
-b = GrafoMI(DIRECTED=False)
-
+b = GrafoMI(DIRECTED=True)
+b.add_edge(1, 2, 7)
+b.add_edge(3, 2, 8)
+b.add_edge(3, 1, 9)
 
 e = GrafoLA().to_graph("output/graphLA.gexf")
 f = GrafoMA().to_graph("output/graphMA.gexf")
 
 print(a)
 print(f)
-
+print(b)
 print(d)
 print(e)
 
