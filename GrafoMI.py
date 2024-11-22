@@ -364,3 +364,34 @@ class GrafoMI:
             new_graph.add_edge(v2, v1, edge_weight, edge_name)
         
         return new_graph
+    
+    def print_revert_graph(self):
+        print("Rever Graph:")
+        print(self.make_revert_graph())
+        
+    def make_underlying_graph(self):
+        # faz o grafo subjacente, ou seja, transforma um grafo direcionado em não dir
+        # Se já for não direcionado lança erro
+        if not self.DIRECTED:
+            raise ValueError("Cannot make underlying graph of a non-directed graph")
+        
+        # cria um novo grafo
+        new_graph = GrafoMI(DIRECTED=False)
+        
+        # adiciona os mesmos vertices a esse grafo
+        for name, node in self.nodes_map.items():
+            new_graph.add_node(name, node.weight)
+            
+        # adiciona as arestas ao grafo subjacente
+        for edge_name, edge_info in self.edges_map.items():
+            v1, v2, edge_index = edge_info
+            # troca o sinal do peso da aresta pq como é direcionado o peso da aresta saindo de v1 tá negativo
+            edge_weight = self.matrix_incidency[self.nodes_map[v1].index][edge_index].weight * -1
+            new_graph.add_edge(v2, v1, edge_weight, edge_name)
+            
+        return new_graph
+            
+    def print_underlying_graph(self):
+        aux = self.make_underlying_graph()
+        print("Underlying Graph")
+        print(str(aux))
