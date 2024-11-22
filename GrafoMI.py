@@ -292,3 +292,10 @@ class GrafoMI:
     def is_empty(self):
         return len(self.nodes_map) == 0
     
+    def is_complete(self):
+        # um grafo é completo se todos os nós forem diretamente adjacentes a todos os outros nós
+        for node1_name, node1 in self.nodes_map.items():
+            for node2_name, node2 in self.nodes_map.items():
+                if node1_name != node2_name and not self.thers_node_adjacente(node1_name, node2_name):
+                    return False
+        return True
