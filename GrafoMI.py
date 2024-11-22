@@ -342,3 +342,25 @@ class GrafoMI:
                 self.add_node(node.index, node.weight)
         else:
             raise ValueError("Number of nodes and nodes list does not match")
+        
+    def make_revert_graph(self):
+        # cria um gafo com as arestas no sentido contrario as arestas do grafo origial
+        # se o grafo não for direcionado joga value error
+        if not self.DIRECTED:
+            raise ValueError("Cannot revert a non-directed graph")
+        
+        # cria um novo grafo
+        new_graph = GrafoMI(DIRECTED=self.DIRECTED)
+        
+        # adiciona os mesmos vertices a esse grafo
+        for name, node in self.nodes_map.items():
+            new_graph.add_node(name, node.weight)
+            
+        # adiciona as arestas trocando sucessor por predecessor
+        for edge_name, edge_info in self.edges_map.items():
+            v1, v2, edge_index = edge_info
+            # troca o sinal do peso da aresta pq como é direcionado o peso da aresta saindo de v1 tá negativo
+            edge_weight = self.matrix_incidency[self.nodes_map[v1].index][edge_index].weight * -1
+            new_graph.add_edge(v2, v1, edge_weight, edge_name)
+        
+        return new_graph
