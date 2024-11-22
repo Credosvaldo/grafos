@@ -31,15 +31,11 @@ print(euler_a)
 print(euler_d)
 
 graph = GrafoLA()
-graph.DIRECTED = False
+graph.DIRECTED = True
 graph.add_node("A", 1.0)
 graph.add_node("B", 2.0)
 graph.add_edge("A", "B", 3.0, "edge1")
 graph.add_edge("B", "AC", 3.0, "edge2")
-euler_path = graph.get_euler_path()
 
-print(euler_path)
-
-new_graph = GrafoMA()
-new_graph.to_graph("output/graphMA.gexf")
-print(new_graph)
+print(graph)
+graph.print_revert_graph()

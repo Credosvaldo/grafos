@@ -1,3 +1,4 @@
+from multiprocessing import Process
 from typing import Dict, List, Tuple
 from models.DFSNode import DFSNode
 from models.ExcludedEdge import ExcludedEdge
@@ -403,6 +404,52 @@ class GrafoLA:
             raise ValueError("Graph has more than one connected component")
 
         return euler_path
+
+    def _depth_first_search(self, graph: "GrafoLA" = None):
+
+        time = [0]
+        result: Dict[str, DFSNode] = {}
+
+        for node_name in self.nodes_map.keys():
+            result[node_name] = DFSNode(0, 0, None)
+
+        for node_name, node_value in result.items():
+            if node_value.discovery_time == 0:
+                self._dfs(node_name, time, result)
+
+        return result
+
+    def make_revert_graph(self):
+
+        if not self.DIRECTED:
+            raise ValueError("Graph is not directed")
+
+        new_graph = GrafoLA(True)
+
+        for node_name in self.nodes_map.keys():
+            node = self.nodes_map[node_name]
+            new_graph.add_node(node.name, node.weight)
+
+        for edge_name in self.edges_map.keys():
+            predecessor, successor, weight = self.edges_map[edge_name]
+            new_graph.add_edge(successor, predecessor, weight, edge_name)
+
+        return new_graph
+
+    def print_revert_graph(self):
+        aux = self.make_revert_graph()
+        print("Revert Graph")
+        print(aux)
+
+    def kosaraju(self):
+        p1 = Process(target=self._depth_first_search())
+        p2 = Process(target=self.make_revert_graph())
+
+        p1.start()
+        p2.start()
+
+        p1.join()
+        p2.join()
 
     # endregion
     # region Bridge and Articulation Section
