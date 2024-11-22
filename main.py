@@ -1,6 +1,7 @@
 from models.DFSNode import DFSNode
 from GrafoMA import GrafoMA
 from GrafoLA import GrafoLA
+from GrafoMI import GrafoMI
 from enums.GraphType import GraphType
 
 a = GrafoMA(DIRECTED=False)
@@ -13,6 +14,8 @@ d = GrafoLA(DIRECTED=False)
 d.add_edge(1, 2, 7)
 d.add_edge(3, 2, 8)
 d.add_edge(3, 1, 9)
+
+b = GrafoMI(DIRECTED=False)
 
 a.to_xml()
 d.to_xml()
