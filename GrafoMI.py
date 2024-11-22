@@ -1,4 +1,5 @@
 from typing import Dict, List, Tuple
+from models.DFSNode import DFSNode
 from models.Edge import Edge
 from models.Node import Node
 
@@ -395,3 +396,40 @@ class GrafoMI:
         aux = self.make_underlying_graph()
         print("Underlying Graph")
         print(str(aux))
+        
+    def _depth_first_search(self):
+        # inicializa o tempo zerado
+        time = [0]
+        # inicializa a tabela do resultado com a key sendo o nome do nó e o valor o TD, TT e pai
+        result: Dict[str, DFSNode] = {}
+        for node_name in self.nodes_map.keys():
+            result[node_name] = DFSNode(0, 0, None)
+
+        # para cada nó que não foi visitado, fazemos uma busca em profundidade
+        for node_name, node_value in result.items():
+            if node_value.discovery_time == 0:
+                self._dfs(node_name, time, result)
+
+        return result
+    
+    def _dfs(self, node_name: str, time: list[int], result: Dict[str, DFSNode]):
+        node_name = str(node_name)
+        # Soma um ao contador global
+        time[0] += 1
+        # Atribui o tempo de descoberta do nó
+        result[node_name].discovery_time = time[0]
+        
+        # Para cada coluna da matriz
+        for edge_index, edge in enumerate(self.matrix_incidency[self.nodes_map[node_name].index]):
+            # se há uma aresta saindo do nó em analise
+            if edge:
+                # Pega o nome do nó que a aresta liga
+                other_node_name = self.edges_map[edge.name][1]
+                # Se o nó não foi descoberto, fazemos uma busca em profundidade nele
+                if result[other_node_name].discovery_time == 0:
+                    result[other_node_name].parent = node_name
+                    self._dfs(other_node_name, time, result)
+
+        # Chegando no final da busca em profundidade, incrementamos o contador global e atribuimos o TT
+        time[0] += 1
+        result[node_name].finishing_time = time[0]
