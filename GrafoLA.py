@@ -12,7 +12,8 @@ class GrafoLA:
         self,
         DIRECTED: bool = True,
         num_nodes: int = 0,
-        nodes: List[NodeLA] = [],  # replace to tupla
+        nodes: List[str, float] = [],
+        edges: List[Tuple[str, str, float]] = [],
     ):
 
         self.nodes_map: Dict[str, NodeLA] = {}
@@ -21,7 +22,7 @@ class GrafoLA:
         )  # predecessor , successor, weight
         self.DIRECTED = DIRECTED
         self.list_adjacency: Dict[str, List[NodeLA]] = {}
-        self.create_adjacency_list(num_nodes, nodes)
+        self.create_adjacency_list(num_nodes, nodes, edges)
 
     def __str__(self):
         result = " List Adjacency\n"
@@ -32,7 +33,12 @@ class GrafoLA:
             result += "\n"
         return result
 
-    def create_adjacency_list(self, num_nodes: int, nodes: List[NodeLA]):
+    def create_adjacency_list(
+        self,
+        num_nodes: int,
+        nodes: List[NodeLA] = [],
+        edges: List[Tuple[str, str, float]] = [],
+    ):
         if nodes == [] and num_nodes == 0:
             return {}
 
@@ -41,18 +47,21 @@ class GrafoLA:
                 "Number of nodes does not match the number of nodes provided"
             )
 
-        if nodes == []:
-            for i in range(num_nodes):
+        for i in range(num_nodes):
 
-                new_edge_name = len(self.edges_map) + 1
-                name = None
+            name = None if nodes == [] else nodes[i][0]
+            weight = None if nodes == [] else nodes[i][1]
+            new_edge_name = len(self.edges_map) + 1
 
-                while name is None or name in self.nodes_map:
-                    name = str(new_edge_name)
-                    new_edge_name += 1
+            while name is None or name in self.nodes_map:
+                name = str(new_edge_name)
+                new_edge_name += 1
 
-                name = str(name)
-                self.add_node(name, 0)
+            name = str(name)
+            self.add_node(name, weight)
+
+        for edge in edges:
+            self.add_edge(edge[0], edge[1], edge[2])
 
     # region Node Section
     def add_node(self, name: str, weight: float = 0):
@@ -113,7 +122,6 @@ class GrafoLA:
         nodes_degree: Dict[str, int] = {}
         for node_name in self.nodes_map.keys():
             nodes_degree[node_name] = 0
-            size = len(self.list_adjacency)
             for edge in self.edges_map.values():
                 if node_name in edge[:2]:
                     nodes_degree[node_name] += 1
