@@ -1,3 +1,4 @@
+from multiprocessing import Process
 from typing import Dict, List, Tuple
 from models.DFSNode import DFSNode
 from models.Edge import Edge
@@ -372,8 +373,7 @@ class GrafoMA:
             if node_value.discovery_time == 0:
                 self._dfs(node_name, time, result)
 
-        print(result)
-        print(time)
+        return result
 
     def _dfs(self, node_name, time, result):
         node_name = str(node_name)
@@ -643,7 +643,11 @@ class GrafoMA:
         result += "</attributes>\n"
         result += "<nodes>\n"
         for node in self.nodes_map:
-            result += self.__writeNode(node)
+            result += (
+                self.__writeNode(node)
+                if self.nodes_map[node].index not in self.excluded_nodes_index
+                else ""
+            )
         result += "</nodes>\n"
         result += "<edges>\n"
         for name in self.edges_map:
@@ -667,16 +671,20 @@ class GrafoMA:
         with open(path, "rb") as file:
             xml = xmltodict.parse(file)
 
-        nodes = xml["gexf"]["graph"]["nodes"]["node"]
-        edges = xml["gexf"]["graph"]["edges"]["edge"]
-        self.DIRECTED = xml["gexf"]["graph"]["@defaultedgetype"] == "directed"
+        graph = xml["gexf"]["graph"]
+        nodes = graph["nodes"]["node"]
+        edges = graph["edges"]
+
+        self.DIRECTED = graph["@defaultedgetype"] == "directed"
 
         for node in nodes:
             self.add_node(node["@label"], node["attvalues"]["attvalue"]["@value"])
 
         if edges == None:
             return self
-        print(len(edges))
+        else:
+            edges = edges["edge"]
+
         if len(edges) == 4 and edges["@source"] != None:
             edges = [edges]
 
@@ -689,3 +697,13 @@ class GrafoMA:
 
             self.add_edge(source, target, edge["@weight"], edge["@label"])
         return self
+
+    def kosaraju(self):
+        p1 = Process(target=self._depth_first_search())
+        p2 = Process(target=self.make_revert_graph())
+
+        p1.start()
+        p2.start()
+
+        p1.join()
+        p2.join()

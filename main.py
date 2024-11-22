@@ -2,7 +2,6 @@ from models.DFSNode import DFSNode
 from GrafoMA import GrafoMA
 from GrafoLA import GrafoLA
 from GrafoMI import GrafoMI
-from enums.GraphType import GraphType
 
 a = GrafoMA(DIRECTED=False)
 
@@ -17,8 +16,6 @@ d.add_edge(3, 1, 9)
 
 b = GrafoMI(DIRECTED=False)
 
-a.to_xml()
-d.to_xml()
 
 e = GrafoLA().to_graph("output/graphLA.gexf")
 f = GrafoMA().to_graph("output/graphMA.gexf")
@@ -37,11 +34,11 @@ print(euler_a)
 print(euler_d)
 
 graph = GrafoLA()
-graph.DIRECTED = False
+graph.DIRECTED = True
 graph.add_node("A", 1.0)
 graph.add_node("B", 2.0)
 graph.add_edge("A", "B", 3.0, "edge1")
 graph.add_edge("B", "AC", 3.0, "edge2")
-euler_path = graph.get_euler_path()
 
-print(euler_path)
+print(graph)
+graph.print_revert_graph()

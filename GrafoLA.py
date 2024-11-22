@@ -1,3 +1,4 @@
+from multiprocessing import Process
 from typing import Dict, List, Tuple
 from models.DFSNode import DFSNode
 from models.ExcludedEdge import ExcludedEdge
@@ -12,7 +13,8 @@ class GrafoLA:
         self,
         DIRECTED: bool = True,
         num_nodes: int = 0,
-        nodes: List[NodeLA] = [],  # replace to tupla
+        nodes: List[Tuple[str, float]] = [],
+        edges: List[Tuple[str, str, float]] = [],
     ):
 
         self.nodes_map: Dict[str, NodeLA] = {}
@@ -21,7 +23,7 @@ class GrafoLA:
         )  # predecessor , successor, weight
         self.DIRECTED = DIRECTED
         self.list_adjacency: Dict[str, List[NodeLA]] = {}
-        self.create_adjacency_list(num_nodes, nodes)
+        self.create_adjacency_list(num_nodes, nodes, edges)
 
     def __str__(self):
         result = " List Adjacency\n"
@@ -32,7 +34,12 @@ class GrafoLA:
             result += "\n"
         return result
 
-    def create_adjacency_list(self, num_nodes: int, nodes: List[NodeLA]):
+    def create_adjacency_list(
+        self,
+        num_nodes: int,
+        nodes: List[Tuple[str, float]] = [],
+        edges: List[Tuple[str, str, float]] = [],
+    ):
         if nodes == [] and num_nodes == 0:
             return {}
 
@@ -41,18 +48,21 @@ class GrafoLA:
                 "Number of nodes does not match the number of nodes provided"
             )
 
-        if nodes == []:
-            for i in range(num_nodes):
+        for i in range(num_nodes):
 
-                new_edge_name = len(self.edges_map) + 1
-                name = None
+            name = None if nodes == [] else nodes[i][0]
+            weight = None if nodes == [] else nodes[i][1]
+            new_edge_name = len(self.edges_map) + 1
 
-                while name is None or name in self.nodes_map:
-                    name = str(new_edge_name)
-                    new_edge_name += 1
+            while name is None or name in self.nodes_map:
+                name = str(new_edge_name)
+                new_edge_name += 1
 
-                name = str(name)
-                self.add_node(name, 0)
+            name = str(name)
+            self.add_node(name, weight)
+
+        for edge in edges:
+            self.add_edge(edge[0], edge[1], edge[2])
 
     # region Node Section
     def add_node(self, name: str, weight: float = 0):
@@ -87,6 +97,7 @@ class GrafoLA:
         It also removes any edges in other nodes' adjacency lists that point to the removed node.
         """
         if name in self.nodes_map:
+            self.remove_all_edge_by_node(name)
             self.nodes_map.pop(name)
             self.list_adjacency.pop(name)
             for node in self.list_adjacency:
@@ -112,7 +123,6 @@ class GrafoLA:
         nodes_degree: Dict[str, int] = {}
         for node_name in self.nodes_map.keys():
             nodes_degree[node_name] = 0
-            size = len(self.list_adjacency)
             for edge in self.edges_map.values():
                 if node_name in edge[:2]:
                     nodes_degree[node_name] += 1
@@ -190,6 +200,20 @@ class GrafoLA:
             self.edges_map.pop(name)
         else:
             raise ValueError("Edge name not found")
+
+    def remove_all_edge_by_node(self, node_name: str):
+        """
+        Removes all edges associated with a node from the graph.
+
+        Args:
+            node_name (str): The name of the node whose edges will be removed.
+
+        This method removes all edges that are adjacent to the specified node from the graph.
+        """
+        for key in list(self.edges_map.keys()):
+            v1, v2, _ = self.edges_map[key]
+            if v1 == node_name or v2 == node_name:
+                self.remove_edge_by_name(key)
 
     def remove_all_edge_by_nodes(self, predecessor: str, successor: str):
         """
@@ -381,6 +405,52 @@ class GrafoLA:
 
         return euler_path
 
+    def _depth_first_search(self, graph: "GrafoLA" = None):
+
+        time = [0]
+        result: Dict[str, DFSNode] = {}
+
+        for node_name in self.nodes_map.keys():
+            result[node_name] = DFSNode(0, 0, None)
+
+        for node_name, node_value in result.items():
+            if node_value.discovery_time == 0:
+                self._dfs(node_name, time, result)
+
+        return result
+
+    def make_revert_graph(self):
+
+        if not self.DIRECTED:
+            raise ValueError("Graph is not directed")
+
+        new_graph = GrafoLA(True)
+
+        for node_name in self.nodes_map.keys():
+            node = self.nodes_map[node_name]
+            new_graph.add_node(node.name, node.weight)
+
+        for edge_name in self.edges_map.keys():
+            predecessor, successor, weight = self.edges_map[edge_name]
+            new_graph.add_edge(successor, predecessor, weight, edge_name)
+
+        return new_graph
+
+    def print_revert_graph(self):
+        aux = self.make_revert_graph()
+        print("Revert Graph")
+        print(aux)
+
+    def kosaraju(self):
+        p1 = Process(target=self._depth_first_search())
+        p2 = Process(target=self.make_revert_graph())
+
+        p1.start()
+        p2.start()
+
+        p1.join()
+        p2.join()
+
     # endregion
     # region Bridge and Articulation Section
     def get_bridge(self):
@@ -519,16 +589,20 @@ class GrafoLA:
         with open(path, "rb") as file:
             xml = xmltodict.parse(file)
 
-        nodes = xml["gexf"]["graph"]["nodes"]["node"]
-        edges = xml["gexf"]["graph"]["edges"]["edge"]
-        self.DIRECTED = xml["gexf"]["graph"]["@defaultedgetype"] == "directed"
+        graph = xml["gexf"]["graph"]
+        nodes = graph["nodes"]["node"]
+        edges = graph["edges"]
+
+        self.DIRECTED = graph["@defaultedgetype"] == "directed"
 
         for node in nodes:
             self.add_node(node["@label"], node["attvalues"]["attvalue"]["@value"])
 
         if edges == None:
             return self
-        print(len(edges))
+        else:
+            edges = edges["edge"]
+
         if len(edges) == 4 and edges["@source"] != None:
             edges = [edges]
 
