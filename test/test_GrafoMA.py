@@ -1,7 +1,5 @@
 import unittest
 from GrafoMA import GrafoMA
-from models.Edge import Edge
-from models.Node import Node
 
 
 class TestGrafoMA(unittest.TestCase):
