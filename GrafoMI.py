@@ -299,3 +299,28 @@ class GrafoMI:
                 if node1_name != node2_name and not self.thers_node_adjacente(node1_name, node2_name):
                     return False
         return True
+    
+    def is_simple(self):
+        # Verificar se há laços
+        for edge_name, edge_info in self.edges_map.items():
+            v1, v2, edge_index = edge_info
+            if v1 == v2:
+                return False
+        
+        # Verificar se há arestas paralelas
+        for edge_name, edge_info in self.edges_map.items():
+            v1, v2, edge_index = edge_info
+            for other_edge_name, other_edge_info in self.edges_map.items():
+                if edge_name != other_edge_name:
+                    other_v1, other_v2, _ = other_edge_info
+                    if self.DIRECTED:
+                        # Verificar se as arestas têm os mesmos dois vértices, na mesma direção
+                        if v1 == other_v1 and v2 == other_v2:
+                            return False
+                    else:
+                        # Verificar se as arestas têm os mesmos dois vértices, independentemente da direção
+                        if {v1, v2} == {other_v1, other_v2}: 
+                            return False
+        
+        # Se não encontrar laços ou arestas paralelas, o grafo é simples
+        return True
