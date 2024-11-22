@@ -174,9 +174,6 @@ class GrafoMI:
         
         node_index = self.nodes_map[name].index
         
-        # remove a linha da matrix
-        self.matrix_incidency.pop(node_index)
-        
         # remove todas as arestas que estavam conectadas ao ní
         edges_to_remove = []
         for edge_index, edge in enumerate(self.matrix_incidency[node_index] if self.matrix_incidency else []):
@@ -199,6 +196,9 @@ class GrafoMI:
             if edge_name is not None:
                 del self.edges_map[edge_name]
         
+        
+        # remove a linha da matrix
+        self.matrix_incidency.pop(node_index)
         del self.nodes_map[name]
         
         self._recreate_matrix()
@@ -282,4 +282,13 @@ class GrafoMI:
                     if self.matrix_incidency[v2_index][edge_index]:
                         return True
         return False
+    
+    def get_edge_count(self):
+        return len(self.edges_map)
+    
+    def get_node_count(self):
+        return len(self.nodes_map)
+    
+    def is_empty(self):
+        return len(self.nodes_map) == 0
     

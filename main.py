@@ -29,6 +29,8 @@ b.add_edge("B", "1", 1.0, "edge3")
 print(b.thers_edge_by_nodes("B", "1"))
 print(b.thers_edge_by_nodes("1", "B"))
 print(b.thers_edge_by_nodes("B", "2"))
+print(b.get_edge_count())
+print(b.get_node_count())
 
 e = GrafoLA().to_graph("output/graphLA.gexf")
 f = GrafoMA().to_graph("output/graphMA.gexf")
