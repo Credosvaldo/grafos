@@ -226,13 +226,18 @@ class GrafoMI:
         v1_index = self.nodes_map[v1].index
         v2_index = self.nodes_map[v2].index
         
-        # para cada aresta que liga v1
+        # Para cada coluna (ou seja, para cada aresta)
         for edge_index, edge in enumerate(self.matrix_incidency[v1_index]):
-            # se existe uma aresta que ainda não foi excluida
-            if edge and edge_index not in self.excluded_edges_intex:
-                # e essa aresta liga v2
-                if self.matrix_incidency[v2_index][edge_index] and edge_index not in self.excluded_edges_intex:
-                    return True
+            # se existe uma aresta (ou seja, a matrix[linha][coluna] != None)
+            if edge:
+                # se o grafo for direcionado só é adjacente se sair de v1 e ir pra v2
+                if self.DIRECTED:
+                    if edge.weight < 0 and self.matrix_incidency[v2_index][edge_index]:
+                        return True
+                else:
+                    # se for não direcionado, basta que a aresta ligue os dois nós
+                    if self.matrix_incidency[v2_index][edge_index]:
+                        return True
         return False
     
     

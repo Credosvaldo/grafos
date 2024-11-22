@@ -14,7 +14,7 @@ d.add_edge(1, 2, 7)
 d.add_edge(3, 2, 8)
 d.add_edge(3, 1, 9)
 
-b = GrafoMI(DIRECTED=True)
+b = GrafoMI(DIRECTED=False)
 b.add_edge(1, 2, 7)
 b.add_edge(3, 2, 8)
 b.add_edge(3, 1, 9)
@@ -25,6 +25,9 @@ b.remove_edge_by_name("edge1")
 b.add_edge("A", "B", 1.0, "edge1")
 b.add_edge("B", "A", 1.0, "edge2")
 b.remove_node("A")
+print(b.thers_node_adjacente("B", "1"))
+print(b.thers_node_adjacente("1", "2")) 
+print(b.thers_node_adjacente("2", "1"))
 
 
 e = GrafoLA().to_graph("output/graphLA.gexf")
