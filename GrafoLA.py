@@ -12,7 +12,7 @@ class GrafoLA:
         self,
         DIRECTED: bool = True,
         num_nodes: int = 0,
-        nodes: List[str, float] = [],
+        nodes: List[Tuple[str, float]] = [],
         edges: List[Tuple[str, str, float]] = [],
     ):
 
@@ -36,7 +36,7 @@ class GrafoLA:
     def create_adjacency_list(
         self,
         num_nodes: int,
-        nodes: List[NodeLA] = [],
+        nodes: List[Tuple[str, float]] = [],
         edges: List[Tuple[str, str, float]] = [],
     ):
         if nodes == [] and num_nodes == 0:
@@ -542,16 +542,20 @@ class GrafoLA:
         with open(path, "rb") as file:
             xml = xmltodict.parse(file)
 
-        nodes = xml["gexf"]["graph"]["nodes"]["node"]
-        edges = xml["gexf"]["graph"]["edges"]["edge"]
-        self.DIRECTED = xml["gexf"]["graph"]["@defaultedgetype"] == "directed"
+        graph = xml["gexf"]["graph"]
+        nodes = graph["nodes"]["node"]
+        edges = graph["edges"]
+
+        self.DIRECTED = graph["@defaultedgetype"] == "directed"
 
         for node in nodes:
             self.add_node(node["@label"], node["attvalues"]["attvalue"]["@value"])
 
         if edges == None:
             return self
-        print(len(edges))
+        else:
+            edges = edges["edge"]
+
         if len(edges) == 4 and edges["@source"] != None:
             edges = [edges]
 
