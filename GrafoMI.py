@@ -15,6 +15,7 @@ class GrafoMI:
             self.nodes_map: Dict[str, Node] = {} # associando o nome do nó com o nó 
             self.edges_map: Dict[str, Tuple[str, str, int]] = {} # associando o nome da aresta com o nome dos nós na ponta e o indice da aresta (ou seja, qual coluna ela representa)
             self.DIRECTED = DIRECTED # Direcionado ou não
+            self._fill_nodes_map(num_nodes, nodes)
             
     def __str__(self) -> str:
         # Header with the names of the edges
@@ -324,3 +325,20 @@ class GrafoMI:
         
         # Se não encontrar laços ou arestas paralelas, o grafo é simples
         return True
+    
+    def _generate_node_name(self, index: int) -> str:
+        resultado = ""
+        while index >= 0:
+            resultado = chr(index % 26 + ord("A")) + resultado
+            index = index // 26 - 1
+        return resultado
+
+    def _fill_nodes_map(self, num_nodes: int, nodes: Node):
+        if not nodes:
+            for i in range(num_nodes):
+                self.add_node(self._generate_node_name(i))
+        elif num_nodes == 0 or len(nodes) == num_nodes:
+            for node in nodes:
+                self.add_node(node.index, node.weight)
+        else:
+            raise ValueError("Number of nodes and nodes list does not match")
