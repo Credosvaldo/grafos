@@ -3,7 +3,7 @@ from typing import Dict, List, Tuple
 from models.DFSNode import DFSNode
 from models.ExcludedEdge import ExcludedEdge
 from models.NodeLA import NodeLA
-from models.ConnectivityDegree import ConnectivityDegree
+from enums.ConnectivityDegree import ConnectivityDegree
 import copy
 import xmltodict
 

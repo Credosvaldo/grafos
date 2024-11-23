@@ -325,7 +325,9 @@ class TestAllGraphDirected(unittest.TestCase):
         self.graphMI.to_graph("output/graphMA.gexf")
         self.graphLA.to_graph("output/graphMA.gexf")
 
-        # self.assertEqual(self.graphMA.connectivity_degree(), self.graphLA.connectivity_degree()) TODO: Check this implementation, probably is wrong
+        self.assertEqual(
+            self.graphMA.connectivity_degree(), self.graphLA.connectivity_degree()
+        )
         self.assertEqual(
             self.graphMA.connectivity_degree(), self.graphMI.connectivity_degree()
         )
