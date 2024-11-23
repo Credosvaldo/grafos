@@ -3,6 +3,7 @@ from typing import Dict, List, Tuple
 from models.DFSNode import DFSNode
 from models.ExcludedEdge import ExcludedEdge
 from models.NodeLA import NodeLA
+from models.ConnectivityDegree import ConnectivityDegree
 import copy
 import xmltodict
 
@@ -741,4 +742,35 @@ class GrafoLA:
         for node_name in nodes_group:
             result[node_name] = DFSNode(0, 0, None)
         return result
+    
+    def connectivity_degree(self):
+        if not self.is_connected():
+            return ConnectivityDegree.DISCONNECTED
+        
+        if self.kosaraju() == 1:
+            return ConnectivityDegree.STRONGLY_CONNECTED
+        
+        results: Dict[str, Dict[str, DFSNode]] = {}
+        
+        for v1_name in self.nodes_map.keys():
+            for v2_name in self.nodes_map.keys():
+                if v1_name != v2_name:
+                    v1_to_v2 = self.reachable(v1_name, v2_name, results)
+                    v2_to_v1 = self.reachable(v2_name, v1_name, results)
+                    if not (v1_to_v2 or v2_to_v1):
+                        return ConnectivityDegree.WEAKLY_CONNECTED
+                    
+        return ConnectivityDegree.UNIDIRECTIONAL_CONNECTED
+            
+        
+    def reachable(self, v1: str, v2: str, results: Dict[str, Dict[str, DFSNode]]):
+        v1 = str(v1)
+        v2 = str(v2)
+
+        if v1 not in results.keys():
+            result = self._get_dfs_result_structure()
+            self._dfs(v1, [0], result)
+            results[v1] = result
+        
+        return results[v1][v2].discovery_time != 0
     # endregion
