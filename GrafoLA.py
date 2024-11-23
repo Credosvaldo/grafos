@@ -431,22 +431,30 @@ class GrafoLA:
         while copy_graph.get_edge_count() > 0:
             euler_path.append(current_node)
             edges_of_current_node = copy_graph.get_edges_by_node(current_node)
+            last_edge = False
 
             if len(edges_of_current_node) == 1:
                 chosen_edge = edges_of_current_node[0]
+                last_edge = True
             else:
                 for edge_name in edges_of_current_node:
                     if not copy_graph.is_bridget(edge_name):
                         chosen_edge = edge_name
+                        last_edge = False
                         break
 
             v1, v2, _ = copy_graph.edges_map[chosen_edge]
-            copy_graph.remove_edge_by_name(chosen_edge)
             current_node = v2 if v1 == current_node else v1
+            
+            if last_edge:
+                copy_graph.remove_node(current_node)
+            else:
+                copy_graph.remove_edge_by_name(chosen_edge)
 
         if copy_graph.get_edge_count() != 0:
             raise ValueError("Graph has more than one connected component")
 
+        euler_path.append(current_node)
         return euler_path
 
     def _depth_first_search(self, graph: "GrafoLA" = None):
