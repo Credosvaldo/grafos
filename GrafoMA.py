@@ -26,7 +26,6 @@ class GrafoMA:
         self._fill_nodes_map(num_nodes, nodes)
 
     def __str__(self):
-        return self.show_some()
         result = "   Adjacency Matrix\n\n"
         result += "      "
         for i in range(len(self.nodes_map)):
