@@ -494,14 +494,30 @@ class GrafoLA:
         print(aux)
 
     def kosaraju(self):
-        p1 = Process(target=self._depth_first_search())
-        p2 = Process(target=self.make_revert_graph())
+        if not self.DIRECTED:
+            raise ValueError("Graph is not directed")
 
-        p1.start()
-        p2.start()
+        number_of_strongly_connected_components = 0
+        dfs = self._depth_first_search()
+        revert = self.make_revert_graph()
 
-        p1.join()
-        p2.join()
+        sorted_keys = sorted(
+            dfs.keys(), reverse=True, key=lambda k: dfs[k].finishing_time
+        )
+
+        time = [0]
+        result = self._get_dfs_result_structure(sorted_keys)
+
+        for key in sorted_keys:
+            if result[key].discovery_time == 0:
+                revert._dfs(key, time, result)
+
+        for dfs_node in result.values():
+            if dfs_node.parent == None:
+                number_of_strongly_connected_components += 1
+
+        return number_of_strongly_connected_components
+        
 
     # endregion
     # region Bridge and Articulation Section
@@ -717,4 +733,12 @@ class GrafoLA:
 
         return result
 
+    def _get_dfs_result_structure(self, nodes_group: List[str] = None):
+        if nodes_group == None:
+            nodes_group = self.nodes_map.keys()
+            
+        result: Dict[str, DFSNode] = {}
+        for node_name in nodes_group:
+            result[node_name] = DFSNode(0, 0, None)
+        return result
     # endregion
