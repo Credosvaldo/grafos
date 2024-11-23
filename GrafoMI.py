@@ -2,6 +2,8 @@ from typing import Dict, List, Tuple
 from models.DFSNode import DFSNode
 from models.Edge import Edge
 from models.Node import Node
+from multiprocessing import Process
+
 
 
 class GrafoMI:
@@ -397,43 +399,6 @@ class GrafoMI:
         print("Underlying Graph")
         print(str(aux))
         
-    def _depth_first_search(self):
-        # inicializa o tempo zerado
-        time = [0]
-        # inicializa a tabela do resultado com a key sendo o nome do nó e o valor o TD, TT e pai
-        result: Dict[str, DFSNode] = {}
-        for node_name in self.nodes_map.keys():
-            result[node_name] = DFSNode(0, 0, None)
-
-        # para cada nó que não foi visitado, fazemos uma busca em profundidade
-        for node_name, node_value in result.items():
-            if node_value.discovery_time == 0:
-                self._dfs(node_name, time, result)
-
-        return result
-    
-    def _dfs(self, node_name: str, time: list[int], result: Dict[str, DFSNode]):
-        node_name = str(node_name)
-        # Soma um ao contador global
-        time[0] += 1
-        # Atribui o tempo de descoberta do nó
-        result[node_name].discovery_time = time[0]
-        
-        # Para cada coluna da matriz
-        for edge_index, edge in enumerate(self.matrix_incidency[self.nodes_map[node_name].index]):
-            # se há uma aresta saindo do nó em analise
-            if edge:
-                # Pega o nome do nó que a aresta liga
-                other_node_name = self.edges_map[edge.name][1]
-                # Se o nó não foi descoberto, fazemos uma busca em profundidade nele
-                if result[other_node_name].discovery_time == 0:
-                    result[other_node_name].parent = node_name
-                    self._dfs(other_node_name, time, result)
-
-        # Chegando no final da busca em profundidade, incrementamos o contador global e atribuimos o TT
-        time[0] += 1
-        result[node_name].finishing_time = time[0]
-        
     def _non_directed_connectivity_degree(self):
         # Inicializa um conjunto para nós visitados
         visited = set()
@@ -517,6 +482,44 @@ class GrafoMI:
                 return "Semi-fortemente Conexo" # se todos os nós são alcançados por todos é semi-fortemente conexo
             return "Fortemente Conexo" # se todos alcançam todos é fortemente conexo
 
+    def _depth_first_search(self):
+        # inicializa o tempo zerado
+        time = [0]
+        # inicializa a tabela do resultado com a key sendo o nome do nó e o valor o TD, TT e pai
+        result: Dict[str, DFSNode] = {}
+        for node_name in self.nodes_map.keys():
+            result[node_name] = DFSNode(0, 0, None)
+
+        # para cada nó que não foi visitado, fazemos uma busca em profundidade
+        numbers_of_trees = 0 # numero de arvores (para o kosaraju)
+        for node_name, node_value in result.items():
+            if node_value.discovery_time == 0:
+                self._dfs(node_name, time, result)
+
+        return result
+    
+    def _dfs(self, node_name: str, time: list[int], result: Dict[str, DFSNode]):
+        node_name = str(node_name)
+        # Soma um ao contador global
+        time[0] += 1
+        # Atribui o tempo de descoberta do nó
+        result[node_name].discovery_time = time[0]
+        
+        # Para cada coluna da matriz
+        for edge_index, edge in enumerate(self.matrix_incidency[self.nodes_map[node_name].index]):
+            # se há uma aresta saindo do nó em analise
+            if edge:
+                # Pega o nome do nó que a aresta liga
+                other_node_name = self.edges_map[edge.name][1]
+                # Se o nó não foi descoberto, fazemos uma busca em profundidade nele
+                if result[other_node_name].discovery_time == 0:
+                    result[other_node_name].parent = node_name
+                    self._dfs(other_node_name, time, result)
+
+        # Chegando no final da busca em profundidade, incrementamos o contador global e atribuimos o TT
+        time[0] += 1
+        result[node_name].finishing_time = time[0]
+
 
     def _get_reachable_nodes(self, start_node_name):
         # Busca em profundidade para pegar todos os nós alcançáveis a partir de um nó inicial
@@ -533,3 +536,30 @@ class GrafoMI:
                         if neighbor not in visited: # ve se ele já foi visitado
                             stack.append(neighbor) # adiciona ao stakck
         return visited
+
+    def kosaraju(self):
+        # Algoritmo de Kosaraju para encontrar componentes fortemente conexos
+        # Primeiro fazemos uma busca em profundidade no grafo subjacente
+        dfs_result = self._depth_first_search()
+        # ao mesmo tempo pegamos o grafo reverso do grafo original
+        grafo_reverso = self.make_revert_graph()
+        # Depois fazemos uma busca em profundidade no grafo reverso em ordem decrescente de TT
+        # pegar os nós em ordem decrescente de TT
+        sorted_nodes = sorted(
+            dfs_result.items(),
+            key=lambda item: item[1].finishing_time,
+            reverse=True
+        )
+        sorted_node_names = [node_name for node_name, _ in sorted_nodes]
+        
+        visited = set() # nós visitados
+        strongly_connected_components = [] # componentes (conjuntos de vértices) fortemente conexos
+        
+        for node_name in sorted_node_names:
+            if node_name not in visited:
+                # Executar busca em profundidade para encontrar todos os nós alcançáveis
+                reachable_nodes = grafo_reverso._get_reachable_nodes(node_name)
+                strongly_connected_components.append(reachable_nodes)
+                visited.update(reachable_nodes)
+
+        return strongly_connected_components
