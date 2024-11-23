@@ -619,6 +619,7 @@ class GrafoMA:
         if copy_graph.get_edge_count() != 0:
             raise ValueError("Graph has more than one connected component")
 
+        euler_path.append(current_node)
         return euler_path
 
     def get_edges_by_node(self, node: str):
