@@ -30,7 +30,7 @@ class TestGrafoMA(unittest.TestCase):
     def test_remove_all_edge_by_nodes(self):
         self.graph.add_edge("A", "B", 1.0, "edge1")
         self.graph.add_edge("A", "B", 2.0, "edge2")
-        self.graph.remove_all_edge_by_nodes("A", "B")
+        self.graph.remove_all_edges_by_nodes("A", "B")
         self.assertEqual(self.graph.get_edge_count(), 0)
 
     def test_remove_node(self):
@@ -127,7 +127,7 @@ class TestGrafoMA(unittest.TestCase):
         self.graph.add_node("F")
         self.graph.add_node("AS")
         self.graph.add_edge("F", "AS", name="edge1")
-        self.assertTrue(self.graph.is_bridget("edge1"))
+        self.assertTrue(self.graph.is_bridge("edge1"))
 
     def test_get_euler_path(self):
         self.graph = GrafoMA(DIRECTED=False)

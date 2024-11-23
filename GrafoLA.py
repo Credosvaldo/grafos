@@ -27,7 +27,7 @@ class GrafoLA:
         self.list_adjacency: Dict[str, List[NodeLA]] = {}
         self.create_adjacency_list(num_nodes, nodes, edges)
 
-    def __str__(self):
+    def __str__(self) -> str:
         result = " List Adjacency\n"
         for node in self.list_adjacency:
             result += f"{node} -> "
@@ -108,7 +108,7 @@ class GrafoLA:
         """
         name = str(name)
         if name in self.nodes_map:
-            self.remove_all_edge_by_node(name)
+            self.remove_all_edges_by_node(name)
             self.nodes_map.pop(name)
             self.list_adjacency.pop(name)
             for node in self.list_adjacency:
@@ -159,7 +159,7 @@ class GrafoLA:
     # endregion
     # region Edge Section
     def add_edge(
-        self, predecessor: str, successor: str, weight: float, name: str = None
+        self, predecessor: str, successor: str, weight: float = 1, name: str = None
     ):
         """
         Adds an edge to the graph.
@@ -229,7 +229,7 @@ class GrafoLA:
         else:
             raise ValueError("Edge name not found")
 
-    def remove_all_edge_by_node(self, node_name: str):
+    def remove_all_edges_by_node(self, node_name: str):
         """
         Removes all edges associated with a node from the graph.
 
@@ -243,7 +243,7 @@ class GrafoLA:
             if v1 == node_name or v2 == node_name:
                 self.remove_edge_by_name(key)
 
-    def remove_all_edge_by_nodes(self, predecessor: str, successor: str):
+    def remove_all_edges_by_nodes(self, predecessor: str, successor: str):
         """
         Removes all edges between two nodes from the graph.
 
@@ -260,37 +260,7 @@ class GrafoLA:
                 key
             ]  # _ is the weight of the edge that we are not using
             if v1 == predecessor and v2 == successor:
-                self.remove_edge(key)
-
-    def remove_edge(self, edge_name: str):
-        """
-        Removes an edge from the graph.
-
-        Args:
-            edge_name (str): The name of the edge to be removed.
-
-        Raises:
-            ValueError: If the edge name is not found in the graph.
-
-        This method removes the specified edge from the edges_map.
-        It also removes the edge from the adjacency list of the predecessor node.
-        """
-        if edge_name in self.edges_map:
-            predecessor, successor, _ = self.edges_map[edge_name]
-
-            self.list_adjacency[predecessor] = list(
-                filter(lambda x: x.name != successor, self.list_adjacency[predecessor])
-            )
-            if not self.DIRECTED:
-                self.list_adjacency[successor] = list(
-                    filter(
-                        lambda x: x.name != predecessor,
-                        self.list_adjacency[successor],
-                    )
-                )
-            self.edges_map.pop(edge_name)
-        else:
-            raise ValueError("Edge name not found")
+                self.remove_edge_by_name(key)
 
     def thers_edge_by_name(self, name: str):
 
@@ -310,9 +280,9 @@ class GrafoLA:
 
         return False
 
-    def thers_edge_adjacency(self, ed1: str, ed2: str):
-        edge_name = str(ed1)
-        edge2_name = str(ed2)
+    def thers_edge_adjacency(self, edge1: str, edge2: str):
+        edge_name = str(edge1)
+        edge2_name = str(edge2)
 
         if edge_name not in self.edges_map or edge2_name not in self.edges_map:
             raise ValueError("edges does not exist")
@@ -454,7 +424,7 @@ class GrafoLA:
 
         euler_path: List[str] = []
         copy_graph = copy.deepcopy(self)
-        is_bridge_method = copy_graph.is_bridge_by_tarjan if by_tarjan else copy_graph.is_bridget
+        is_bridge_method = copy_graph.is_bridge_by_tarjan if by_tarjan else copy_graph.is_bridge
 
         nodes_degree = copy_graph.get_all_nodes_degree()
         odd_degree_nodes = [
@@ -585,7 +555,7 @@ class GrafoLA:
 
         return bridges
 
-    def is_bridget(self, edge_name: str):
+    def is_bridge(self, edge_name: str):
         """
         Check if the given edge is a bridge.
         Args:
@@ -602,8 +572,9 @@ class GrafoLA:
             self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
         )
         copy_graph.remove_edge_by_name(edge_name)
+        v1, v2, _ = self.edges_map[edge_name]
 
-        is_bridge = not copy_graph.is_connected()
+        is_bridge = not copy_graph.reachable(v1, v2)
 
         return is_bridge
 
@@ -800,7 +771,7 @@ class GrafoLA:
 
         return ConnectivityDegree.UNIDIRECTIONAL_CONNECTED
 
-    def reachable(self, v1: str, v2: str, results: Dict[str, Dict[str, DFSNode]]):
+    def reachable(self, v1: str, v2: str, results: Dict[str, Dict[str, DFSNode]] = {}):
         v1 = str(v1)
         v2 = str(v2)
 

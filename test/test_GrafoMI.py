@@ -120,7 +120,7 @@ class TestGrafoMI(unittest.TestCase):
         self.graph.add_node("A")
         self.graph.add_node("B")
         self.graph.add_edge("A", "B", name="edge1")
-        self.assertTrue(self.graph.is_brige("edge1"))
+        self.assertTrue(self.graph.is_bridge("edge1"))
 
     def test_get_euler_path(self):
         self.graph = GrafoMI(DIRECTED=False)

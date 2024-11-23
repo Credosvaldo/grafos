@@ -133,7 +133,7 @@ class TestGrafoLA(unittest.TestCase):
         self.graph.add_node("A", 1.0)
         self.graph.add_node("B", 2.0)
         self.graph.add_edge("A", "B", 3.0, "edge1")
-        self.assertTrue(self.graph.is_bridget("edge1"))
+        self.assertTrue(self.graph.is_bridge("edge1"))
 
     def test_is_articulation(self):
         self.graph.add_node("A", 1.0)

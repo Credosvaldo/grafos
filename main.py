@@ -10,8 +10,6 @@ print(a)
 print(a.edges_map)
 print(len(a.edges_map))
 
-exit()
-
 d = GrafoLA(DIRECTED=False)
 d.add_edge(1, 2, 7)
 d.add_edge(3, 2, 8)

@@ -1,4 +1,5 @@
 from typing import Dict, List, Tuple
+from Grafo import Grafo
 from enums.ConnectivityDegree import ConnectivityDegree
 from models.TarjansNode import TarjansNode
 from models.DFSNode import DFSNode
@@ -9,7 +10,7 @@ from multiprocessing import Process
 import copy
 
 
-class GrafoMI:
+class GrafoMI(Grafo):
 
     def __init__(
         self,
@@ -70,7 +71,7 @@ class GrafoMI:
 
     # Recebemos quem a aresta liga, o nome e peso dela
     def add_edge(
-        self, predecessor: str, sucessor: str, weight: float = 1, name: str = None
+        self, predecessor: str, successor: str, weight: float = 1, name: str = None
     ):
         # Vemos o nome das arestas como únicos, então se já existir é erro
         if name != None and str(name) in self.edges_map:
@@ -87,7 +88,7 @@ class GrafoMI:
         name = str(name)
 
         v1 = str(predecessor)  # predecessor
-        v2 = str(sucessor)  # sucessor
+        v2 = str(successor)  # successor
 
         if v1 not in self.nodes_map:
             self.add_node(v1)
@@ -137,9 +138,9 @@ class GrafoMI:
         self._recreate_matrix()
 
     # Remove todas as arestas entre dois nós
-    def remove_all_edges_by_nodes(self, predecessor: str, sucessor: str):
+    def remove_all_edges_by_nodes(self, predecessor: str, successor: str):
         v1 = str(predecessor)
-        v2 = str(sucessor)
+        v2 = str(successor)
 
         if v1 not in self.nodes_map or v2 not in self.nodes_map:
             raise ValueError("Node does not exist")
@@ -179,7 +180,7 @@ class GrafoMI:
 
         self._recreate_matrix()
 
-    def add_node(self, name: str, weight: float = 1):
+    def add_node(self, name: str, weight: float = 1.0):
         name = str(name)
         if name in self.nodes_map:
             raise ValueError(f"Já existe um nó com o nome {name}")
@@ -246,9 +247,9 @@ class GrafoMI:
                 self.edges_map[edge_name][3],
             )
 
-    def thers_node_adjacency(self, predecessor: str, sucessor: str):
+    def thers_node_adjacency(self, predecessor: str, successor: str):
         v1 = str(predecessor)
-        v2 = str(sucessor)
+        v2 = str(successor)
 
         if v1 not in self.nodes_map or v2 not in self.nodes_map:
             raise ValueError("Node does not exist")
@@ -271,9 +272,9 @@ class GrafoMI:
                         return True
         return False
     
-    def thers_only_one_edge_btwn_nodes(self, predecessor: str, sucessor: str):
+    def thers_only_one_edge_btwn_nodes(self, predecessor: str, successor: str):
         v1 = str(predecessor)
-        v2 = str(sucessor)
+        v2 = str(successor)
 
         if v1 not in self.nodes_map or v2 not in self.nodes_map:
             raise ValueError("Node does not exist")
@@ -296,7 +297,7 @@ class GrafoMI:
                         count += 1
         return count == 1
 
-    def theres_edge_adjacente(self, edge1: str, edge2: str):
+    def thers_edge_adjacency(self, edge1: str, edge2: str):
         if edge1 not in self.edges_map or edge2 not in self.edges_map:
             raise ValueError("Edge does not exist")
 
@@ -314,9 +315,9 @@ class GrafoMI:
     def thers_edge_by_name(self, name: str):
         return str(name) in self.edges_map
 
-    def thers_edge_by_nodes(self, predecessor: str, sucessor: str):
+    def thers_edge_by_nodes(self, predecessor: str, successor: str):
         v1 = str(predecessor)
-        v2 = str(sucessor)
+        v2 = str(successor)
 
         if v1 not in self.nodes_map or v2 not in self.nodes_map:
             raise ValueError("Node does not exist")
@@ -328,8 +329,8 @@ class GrafoMI:
         for edge_index, edge in enumerate(self.matrix_incidency[v1_index]):
             # se a aresta existir na linha do v1 (ou seja, a matrix[linha][coluna] != None)
             if edge:
-                # se o grafo for direcionado a aresta tem que sair do predecessor e ir pro sucessor
-                # ou seja, o peso tem que ser negativo e a coluna tem que existir no sucessor
+                # se o grafo for direcionado a aresta tem que sair do predecessor e ir pro successor
+                # ou seja, o peso tem que ser negativo e a coluna tem que existir no successor
                 if self.DIRECTED:
                     if edge.weight < 0 and self.matrix_incidency[v2_index][edge_index]:
                         return True
@@ -417,7 +418,7 @@ class GrafoMI:
         for name, node in self.nodes_map.items():
             new_graph.add_node(name, node.weight)
 
-        # adiciona as arestas trocando sucessor por predecessor
+        # adiciona as arestas trocando successor por predecessor
         for edge_name, edge_info in self.edges_map.items():
             v1, v2, edge_index, _ = edge_info
             # troca o sinal do peso da aresta pq como é direcionado o peso da aresta saindo de v1 tá negativo
@@ -554,9 +555,7 @@ class GrafoMI:
         # inicializa o tempo zerado
         time = [0]
         # inicializa a tabela do resultado com a key sendo o nome do nó e o valor o TD, TT e pai
-        result: Dict[str, DFSNode] = {}
-        for node_name in self.nodes_map.keys():
-            result[node_name] = DFSNode(0, 0, None)
+        result = self._get_dfs_result_structure()
 
         # para cada nó que não foi visitado, fazemos uma busca em profundidade
         numbers_of_trees = 0  # numero de arvores (para o kosaraju)
@@ -810,7 +809,14 @@ class GrafoMI:
                 edges.append(edge_name)
         return edges
 
-    def is_brige(self, edge_name: str):
+    def is_bridge(self, edge_name: str):
+        """
+        Check if the given edge is a bridge.
+        Args:
+            edge_name (str): The edge name.
+        Returns:
+            bool: True if the edge is a bridge, False otherwise.
+        """
         if edge_name not in self.edges_map:
             raise ValueError("Edge name does not exist")
 
@@ -819,8 +825,9 @@ class GrafoMI:
         )
 
         copy_graph.remove_edge_by_name(edge_name)
-
-        is_bridge = not copy_graph.is_connected()
+        v1, v2, _, _ = copy_graph.edges_map[edge_name]
+        
+        is_bridge = not copy_graph.reachable(v1, v2)
 
         return is_bridge
 
@@ -999,3 +1006,23 @@ class GrafoMI:
         edge_name = str(edge_name)
         bridges = self.get_bridge_by_tarjan()
         return edge_name in bridges
+    
+    def reachable(self, v1: str, v2: str, results: Dict[str, Dict[str, DFSNode]] = {}):
+        v1 = str(v1)
+        v2 = str(v2)
+
+        if v1 not in results.keys():
+            result = self._get_dfs_result_structure()
+            self._dfs(v1, [0], result)
+            results[v1] = result
+
+        return results[v1][v2].discovery_time != 0
+    
+    def _get_dfs_result_structure(self, nodes_group: List[str] = None):
+        if nodes_group == None:
+            nodes_group = self.nodes_map.keys()
+
+        result: Dict[str, DFSNode] = {}
+        for node_name in nodes_group:
+            result[node_name] = DFSNode(0, 0, None)
+        return result

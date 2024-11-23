@@ -28,7 +28,7 @@ class GrafoMA:
         self.excluded_nodes_index = []
         self._fill_nodes_map(num_nodes, nodes, random_graph_generation)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.show_some()
         result = "   Adjacency Matrix\n\n"
         result += "      "
@@ -137,7 +137,7 @@ class GrafoMA:
             self.matrix_adjacency[v2_index][v1_index].pop(parallel_index)
 
     # Remove all edges between two nodes
-    def remove_all_edge_by_nodes(self, predecessor: str, successor: str):
+    def remove_all_edges_by_nodes(self, predecessor: str, successor: str):
         v1 = str(predecessor)
         v2 = str(successor)
 
@@ -156,7 +156,7 @@ class GrafoMA:
                 self.edges_map.pop(edge.name)
             self.matrix_adjacency[v2_index][v1_index] = []
 
-    def add_node(self, name: str = None, weight: float = 0):
+    def add_node(self, name: str = None, weight: float = 1.0):
         if str(name) in self.nodes_map:
             raise ValueError("Node already exists")
 
@@ -220,12 +220,12 @@ class GrafoMA:
 
         return self.matrix_adjacency[v1_index][v2_index] != []
 
-    def thers_edge_adjacence(self, ed1: str, ed2: str):
-        ed1 = str(ed1)
-        ed2 = str(ed2)
+    def thers_edge_adjacency(self, edge1: str, edge2: str):
+        edge1 = str(edge1)
+        edge2 = str(edge2)
 
-        nodes_ed1 = self.edges_map[ed1]
-        nodes_ed2 = self.edges_map[ed2]
+        nodes_ed1 = self.edges_map[edge1]
+        nodes_ed2 = self.edges_map[edge2]
 
         return any(v in nodes_ed2[:2] for v in nodes_ed1[:2])
 
@@ -487,7 +487,7 @@ class GrafoMA:
 
         return bridges
 
-    def is_bridget(self, edge_name: str):
+    def is_bridge(self, edge_name: str):
         """
         Check if the given edge is a bridge.
         Args:
@@ -506,7 +506,7 @@ class GrafoMA:
         copy_graph.remove_edge_by_name(edge_name)
         v1, v2, _ = copy_graph.edges_map[edge_name]
 
-        is_bridge = not copy_graph.reachable(v1, v2, {})
+        is_bridge = not copy_graph.reachable(v1, v2)
 
         return is_bridge
 
@@ -598,7 +598,7 @@ class GrafoMA:
         euler_path: List[str] = []
         copy_graph = copy.deepcopy(self)
         is_bridge_method = (
-            copy_graph.is_bridge_by_tarjan if by_tarjan else copy_graph.is_bridget
+            copy_graph.is_bridge_by_tarjan if by_tarjan else copy_graph.is_bridge
         )
 
         nodes_degree = copy_graph.get_all_nodes_degree()
@@ -642,7 +642,7 @@ class GrafoMA:
         euler_path.append(current_node)
         return euler_path
 
-    def get_edges_by_node(self, node: str):
+    def get_edges_by_node(self, node_name: str):
         """
         Get all edges that are connected to the given node.
         Args:
@@ -650,8 +650,8 @@ class GrafoMA:
         Returns:
             List[str]: A list with the edges name.
         """
-        node = str(node)
-        node_index = self.nodes_map[node].index
+        node_name = str(node_name)
+        node_index = self.nodes_map[node_name].index
         edges_name = [
             edge.name
             for sublist in self.matrix_adjacency[node_index]
