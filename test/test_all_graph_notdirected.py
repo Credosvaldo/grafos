@@ -93,7 +93,6 @@ class TestAllGraphNotDirected(unittest.TestCase):
 
         self.graphMI.to_graph("output/graphMA.gexf")
         self.graphLA.to_graph("output/graphMA.gexf")
-        
 
 
 if __name__ == "__main__":

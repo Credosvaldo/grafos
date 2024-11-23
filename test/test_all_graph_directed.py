@@ -302,8 +302,10 @@ class TestAllGraphDirected(unittest.TestCase):
         self.graphMA.to_xml()
 
         self.graphMI.to_graph("output/graphMA.gexf")
+        self.graphLA.to_graph("output/graphMA.gexf")
 
         self.assertEqual(self.graphMA.kosaraju(), self.graphMI.kosaraju())
+        self.assertEqual(self.graphMA.kosaraju(), self.graphLA.kosaraju())
 
     def test_connectivity_degree(self):
         self.graphMA.add_edge(1, 2, 1)
