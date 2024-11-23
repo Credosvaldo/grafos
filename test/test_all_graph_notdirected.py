@@ -94,8 +94,12 @@ class TestAllGraphNotDirected(unittest.TestCase):
         self.graphMI.to_graph("output/graphMA.gexf")
         self.graphLA.to_graph("output/graphMA.gexf")
 
-        self.assertEqual(self.graphLA.get_bridge_by_tarjan(), self.graphMA.get_bridge_by_tarjan())
-        self.assertEqual(self.graphMA.get_bridge_by_tarjan(), self.graphMI.get_bridge_by_tarjan())
+        self.assertEqual(
+            self.graphLA.get_bridge_by_tarjan(), self.graphMA.get_bridge_by_tarjan()
+        )
+        self.assertEqual(
+            self.graphMA.get_bridge_by_tarjan(), self.graphMI.get_bridge_by_tarjan()
+        )
 
 
 if __name__ == "__main__":
