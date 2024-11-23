@@ -68,6 +68,29 @@ print(graphMI)
 print(graphMa)
 print(graphLA)
 
+
+graphMa.add_edge(1, 2, 1)
+graphMa.add_edge(2, 3, 1)
+graphMa.add_edge(3, 4, 1)
+
+graphLA.add_edge(1, 2, 1)
+graphLA.add_edge(2, 3, 1)
+graphLA.add_edge(3, 4, 1)
+
+graphLA.to_xml()
+print(graphMa)
+print(graphLA)
+
+print("\nIs bridge")
+# print(graphMI.get_bridge()) when implemented will return the bridges
+print(graphMa.get_bridge())
+print(graphLA.get_bridge())
+
+print("\nIs articulation point")
+# print(graphMI.get_articulation_point()) when implemented will return the articulation points
+print(graphMa.get_articulations())
+print(graphLA.get_articulations())
+
 print("\nIs complete")
 print(graphMI.is_complete())
 print(graphMa.is_complete())
@@ -82,16 +105,3 @@ print("\nIs connected")
 print(graphMI.is_connected())
 print(graphMa.is_connected())
 print(graphLA.is_connected())
-
-
-graphMa.add_edge(1, 2, 1)
-graphMa.add_edge(2, 3, 1)
-graphMa.add_edge(3, 4, 1)
-
-graphLA.add_edge(1, 2, 1)
-graphLA.add_edge(2, 3, 1)
-graphLA.add_edge(3, 4, 1)
-
-print("\nIs bridge")
-print(graphMa.get_bridge()) 
-print(graphLA.get_bridge())
