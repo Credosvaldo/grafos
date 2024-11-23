@@ -431,7 +431,7 @@ class GrafoMA:
         Returns:
             List[Edges]: A list with all bridge edges name.
         """
-        if not self.is_connected:
+        if not self.is_connected():
             raise ValueError("Graph is not connected")
     
         if self.is_empty():
