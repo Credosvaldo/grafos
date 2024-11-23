@@ -11,7 +11,6 @@ import copy
 import xmltodict
 
 
-
 class GrafoMA:
 
     def __init__(
@@ -149,7 +148,7 @@ class GrafoMA:
             self.edges_map.pop(edge.name)
         self.matrix_adjacency[v1_index][v2_index] = []
 
-        if not self.DIRECTED:
+        if self.DIRECTED:
             for edge in self.matrix_adjacency[v2_index][v1_index]:
                 self.edges_map.pop(edge.name)
             self.matrix_adjacency[v2_index][v1_index] = []
@@ -456,7 +455,7 @@ class GrafoMA:
         """
         if not self.is_connected():
             raise ValueError("Graph is not connected")
-    
+
         if self.is_empty():
             return []
 
@@ -610,7 +609,7 @@ class GrafoMA:
 
             v1, v2, _ = copy_graph.edges_map[chosen_edge]
             current_node = v2 if v1 == current_node else v1
-            
+
             if last_edge:
                 copy_graph.remove_node(current_node)
             else:
@@ -734,7 +733,7 @@ class GrafoMA:
     def _paralel_dfs(self, shared_dict):
         result = self._depth_first_search()
         shared_dict["dfs"] = result
-    
+
     def _paralel_make_revert_graph(self, shared_dict):
         result = self.make_revert_graph()
         shared_dict["revert"] = result
@@ -742,13 +741,15 @@ class GrafoMA:
     def kosaraju(self):
         if not self.DIRECTED:
             raise ValueError("Graph is not directed")
-        
+
         number_of_strongly_connected_components = 0
         dfs = self._depth_first_search()
         revert = self.make_revert_graph()
-        
-        sorted_keys = sorted(dfs.keys(), reverse=True, key=lambda k: dfs[k].finishing_time)
-        
+
+        sorted_keys = sorted(
+            dfs.keys(), reverse=True, key=lambda k: dfs[k].finishing_time
+        )
+
         time = [0]
         result = self._get_dfs_result_structure(sorted_keys)
 
@@ -758,43 +759,49 @@ class GrafoMA:
 
         for dfs_node in result.values():
             if dfs_node.parent == None:
-                number_of_strongly_connected_components+=1 
-        
+                number_of_strongly_connected_components += 1
+
         return number_of_strongly_connected_components
 
-    def _tarjan_dfs(self, node_name: str, result: Dict[str, TarjansNode], bridges: List[str], time: List[int]):
+    def _tarjan_dfs(
+        self,
+        node_name: str,
+        result: Dict[str, TarjansNode],
+        bridges: List[str],
+        time: List[int],
+    ):
         result[node_name].visited = True
         result[node_name].disc = time[0]
         result[node_name].low = time[0]
         time[0] += 1
-        
+
         node_index = self.nodes_map[node_name].index
 
         for v in self.matrix_adjacency[node_index]:
             if len(v) == 0:
                 continue
-            
+
             edge = v[0]
             v1, v2, _ = self.edges_map[edge.name]
             neibor = v2 if v1 == node_name else v1
-            
+
             if not result[neibor].visited:
                 result[neibor].parent = node_name
-                
+
                 self._tarjan_dfs(neibor, result, bridges, time)
 
                 result[node_name].low = min(result[node_name].low, result[neibor].low)
 
                 if result[neibor].low > result[node_name].disc:
                     bridges.append(edge.name)
-                    
+
             elif neibor != result[node_name].parent:
                 result[node_name].low = min(result[node_name].low, result[neibor].disc)
 
     def get_bridge_by_tarjan(self):      
         if not self.is_connected():
             raise ValueError("Graph is not connected")
-        
+
         if self.is_empty():
             return []
 
@@ -805,10 +812,10 @@ class GrafoMA:
         )
 
         result: Dict[str, TarjansNode] = {}
-        
+
         for node_name in self.nodes_map.keys():
             result[node_name] = TarjansNode(False, None, 0, 0)
-            
+
         for node_name in copy_graph.nodes_map.keys():
             if not result[node_name].visited:
                 self._tarjan_dfs(node_name, result, bridges, time)

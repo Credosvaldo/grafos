@@ -50,6 +50,7 @@ graph.add_node("A", 1.0)
 graph.add_node("B", 2.0)
 graph.add_edge("A", "B", 3.0, "edge1")
 graph.add_edge("B", "AC", 3.0, "edge2")
+graph.add_edge("A", "B", 3.0, "edge3")
 
 print(graph)
 graph.print_revert_graph()

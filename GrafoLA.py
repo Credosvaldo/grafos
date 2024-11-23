@@ -84,8 +84,8 @@ class GrafoLA:
         Raises:
         ValueError: If a node with the given name already exists in the graph.
         """
-        if name not in self.nodes_map:
-            name = str(name)
+        name = str(name)
+        if name not in self.nodes_map: 
             self.list_adjacency[name] = []
             self.nodes_map[name] = NodeLA(weight, name)
         else:
@@ -104,6 +104,7 @@ class GrafoLA:
         This method removes the specified node from the nodes_map and list_adjacency.
         It also removes any edges in other nodes' adjacency lists that point to the removed node.
         """
+        name = str(name)
         if name in self.nodes_map:
             self.remove_all_edge_by_node(name)
             self.nodes_map.pop(name)
@@ -231,12 +232,44 @@ class GrafoLA:
 
         This method removes all edges between the predecessor and successor nodes from the graph.
         """
+        predecessor = str(predecessor)
+        successor = str(successor)
         for key in list(self.edges_map.keys()):
             v1, v2, _ = self.edges_map[
                 key
             ]  # _ is the weight of the edge that we are not using
             if v1 == predecessor and v2 == successor:
                 self.remove_edge(key)
+
+    def remove_edge(self, edge_name: str):
+        """
+        Removes an edge from the graph.
+
+        Args:
+            edge_name (str): The name of the edge to be removed.
+
+        Raises:
+            ValueError: If the edge name is not found in the graph.
+
+        This method removes the specified edge from the edges_map.
+        It also removes the edge from the adjacency list of the predecessor node.
+        """
+        if edge_name in self.edges_map:
+            predecessor, successor, _ = self.edges_map[edge_name]
+
+            self.list_adjacency[predecessor] = list(
+                filter(lambda x: x.name != successor, self.list_adjacency[predecessor])
+            )
+            if not self.DIRECTED:
+                self.list_adjacency[successor] = list(
+                    filter(
+                        lambda x: x.name != predecessor,
+                        self.list_adjacency[successor],
+                    )
+                )
+            self.edges_map.pop(edge_name)
+        else:
+            raise ValueError("Edge name not found")
 
     def thers_edge_by_name(self, name: str):
 
@@ -317,6 +350,11 @@ class GrafoLA:
 
             if aux.count(self.nodes_map[node_key]) > 0:
                 return False
+
+            for neighbor in aux:
+                if aux.count(neighbor) > 1:
+                    return False
+
         return True
 
     def is_connected(self):
