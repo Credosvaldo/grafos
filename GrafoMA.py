@@ -422,7 +422,8 @@ class GrafoMA:
 
         if v1 not in results.keys():
             result = self._get_dfs_result_structure()
-            results[v1] = self._dfs(v1, [0], result)
+            self._dfs(v1, [0], result)
+            results[v1] = result
         
         return results[v1][v2].discovery_time != 0
 
