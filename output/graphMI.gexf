@@ -37,13 +37,13 @@
 </node>
 </nodes>
 <edges>
-<edge label='edge1' source='A' target='B' weight='1.0'/>
-<edge label='edge2' source='A' target='C' weight='2.0'/>
-<edge label='edge3' source='B' target='D' weight='3.0'/>
-<edge label='edge4' source='B' target='E' weight='4.0'/>
-<edge label='edge5' source='C' target='F' weight='5.0'/>
-<edge label='edge6' source='D' target='F' weight='6.0'/>
-<edge label='edge7' source='E' target='F' weight='7.0'/>
+<edge label='edge1' source='A' target='B' weight='0'/>
+<edge label='edge2' source='A' target='C' weight='1'/>
+<edge label='edge3' source='B' target='D' weight='2'/>
+<edge label='edge4' source='B' target='E' weight='3'/>
+<edge label='edge5' source='C' target='F' weight='4'/>
+<edge label='edge6' source='D' target='F' weight='5'/>
+<edge label='edge7' source='E' target='F' weight='6'/>
 </edges>
 </graph>
 </gexf>

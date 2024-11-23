@@ -53,3 +53,33 @@ graph.add_edge("B", "AC", 3.0, "edge2")
 
 print(graph)
 graph.print_revert_graph()
+
+
+graphLa = GrafoMI()
+graphLa.add_node("A", 1.0)
+graphLa.add_node("B", 2.0)
+graphLa.add_node("C", 3.0)
+graphLa.add_node("D", 4.0)
+graphLa.add_node("E", 5.0)
+graphLa.add_node("F", 6.0)
+
+graphLa.add_edge("A", "B", 1.0, "edge1")
+graphLa.add_edge("A", "C", 2.0, "edge2")
+graphLa.add_edge("B", "D", 3.0, "edge3")
+graphLa.add_edge("B", "E", 4.0, "edge4")
+graphLa.add_edge("C", "F", 5.0, "edge5")
+graphLa.add_edge("D", "F", 6.0, "edge6")
+graphLa.add_edge("E", "F", 7.0, "edge7")
+
+graphLa.to_xml()
+
+graphMa = GrafoMA()
+graphMa.to_graph("output/graphMI.gexf")
+
+graphMI = GrafoLA()
+graphMI.to_graph("output/graphMI.gexf")
+
+
+print(graphLa)
+print(graphMa)
+print(graphMI)
