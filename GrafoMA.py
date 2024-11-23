@@ -307,7 +307,7 @@ class GrafoMA:
         new_graph = GrafoMA(True)
         size = len(self.matrix_adjacency)
 
-        for name, node in self.nodes_map:
+        for name, node in self.nodes_map.items():
             new_graph.add_node(name, node.weight)
 
         for i in range(size):
@@ -710,10 +710,11 @@ class GrafoMA:
         if not self.DIRECTED:
             raise ValueError("Graph is not directed")
         
+        number_of_strongly_connected_components = 0
         dfs = self._depth_first_search()
         revert = self.make_revert_graph()
         
-        sorted_keys = sorted(dfs.keys(), key=lambda k: dfs[k].finishing_time)
+        sorted_keys = sorted(dfs.keys(), reverse=True, key=lambda k: dfs[k].finishing_time)
         
         time = [0]
         result: Dict[str, DFSNode] = {}
@@ -722,7 +723,7 @@ class GrafoMA:
             result[key] = DFSNode(0, 0, None)
 
         for key in sorted_keys:
-            if dfs[key].discovery_time == 0:
+            if result[key].discovery_time == 0:
                 revert._dfs(key, time, result)
 
         for dfs_node in result.values():
