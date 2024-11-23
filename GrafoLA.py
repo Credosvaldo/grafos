@@ -129,6 +129,25 @@ class GrafoLA:
             if neighbor.name == successor:
                 return True
         return False
+    
+    def thers_only_one_edge_btwn_nodes(self, predecessor: str, successor: str):
+        v1 = str(predecessor)
+        v2 = str(successor)
+
+        if v1 not in self.list_adjacency or v2 not in self.list_adjacency:
+            raise ValueError("nodes does not exist")
+
+        thers_edge = False
+        for neighbor in self.list_adjacency[predecessor]:
+            if neighbor.name != successor:
+                continue
+            
+            if thers_edge:
+                return False
+            else:
+                thers_edge = True
+                
+        return thers_edge
 
     def get_all_nodes_degree(self):
         nodes_degree: Dict[str, int] = {}
@@ -356,11 +375,10 @@ class GrafoLA:
     def is_complete(self):
 
         for node_key in self.list_adjacency:
-            aux = self.list_adjacency[node_key]
-
             for key in self.nodes_map:
-
-                if aux.count(self.nodes_map[key]) == 0 and node_key != key:
+                if node_key == key and self.thers_node_adjacency(node_key, key):
+                    return False
+                if node_key != key and not self.thers_only_one_edge_btwn_nodes(node_key, key):
                     return False
 
         return True

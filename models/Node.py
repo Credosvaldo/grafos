@@ -1,5 +1,5 @@
 class Node:
-    def __init__(self, index: int, weight: float = None):
+    def __init__(self, index: int, weight: float = 1):
         self.index = index
         self.weight = weight
 

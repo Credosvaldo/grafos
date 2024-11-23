@@ -3,11 +3,14 @@ from GrafoMA import GrafoMA
 from GrafoLA import GrafoLA
 from GrafoMI import GrafoMI
 
-a = GrafoMA(DIRECTED=False)
 
-a.add_edge(1, 2, 7)
-a.add_edge(3, 2, 8)
-a.add_edge(3, 1, 9)
+a = GrafoMA(DIRECTED=False, num_nodes=10, random_graph_generation=True)
+
+print(a)
+print(a.edges_map)
+print(len(a.edges_map))
+
+exit()
 
 d = GrafoLA(DIRECTED=False)
 d.add_edge(1, 2, 7)

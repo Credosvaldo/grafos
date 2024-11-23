@@ -1,4 +1,5 @@
 from multiprocessing import Process, Manager
+import random
 from typing import Dict, List, Tuple
 from enums.ConnectivityDegree import ConnectivityDegree
 from models.TarjansNode import TarjansNode
@@ -18,15 +19,17 @@ class GrafoMA:
         DIRECTED: bool = True,
         num_nodes: int = 0,
         nodes: List[Tuple[str, float]] = [],
+        random_graph_generation: bool = False
     ):
         self.matrix_adjacency: List[List[List[Edge]]] = self._create_matrix(num_nodes)
         self.nodes_map: Dict[str, Node] = {}
         self.edges_map: Dict[str, Tuple[str, str, int]] = {}
         self.DIRECTED = DIRECTED
         self.excluded_nodes_index = []
-        self._fill_nodes_map(num_nodes, nodes)
+        self._fill_nodes_map(num_nodes, nodes, random_graph_generation)
 
     def __str__(self):
+        return self.show_some()
         result = "   Adjacency Matrix\n\n"
         result += "      "
         for i in range(len(self.nodes_map)):
@@ -165,7 +168,7 @@ class GrafoMA:
             new_node_index = self.excluded_nodes_index.pop(0)
             usin_a_excluded_node = True
         else:
-            new_node_index = len(self.matrix_adjacency)
+            new_node_index = matrix_size
             usin_a_excluded_node = False
 
         while name is None or name in self.nodes_map:
@@ -188,10 +191,11 @@ class GrafoMA:
         if name not in self.nodes_map:
             raise ValueError("node does not exist")
 
+        size = len(self.matrix_adjacency)
         node_index = self.nodes_map[name].index
         self.excluded_nodes_index.append(node_index)
 
-        for i in range(len(self.matrix_adjacency)):
+        for i in range(size):
             for edge in self.matrix_adjacency[i][node_index]:
                 del self.edges_map[edge.name]
 
@@ -204,7 +208,7 @@ class GrafoMA:
 
         self.nodes_map.pop(name)
 
-    def thers_node_adjacente(self, predecessor: str, successor: str):
+    def thers_node_adjacency(self, predecessor: str, successor: str):
         v1 = str(predecessor)
         v2 = str(successor)
 
@@ -237,6 +241,15 @@ class GrafoMA:
         v2_index = self.nodes_map[v2].index
 
         return self.matrix_adjacency[v1_index][v2_index] != []
+    
+    def thers_only_one_edge_btwn_nodes(self, predecessor: str, successor: str):
+        v1 = str(predecessor)
+        v2 = str(successor)
+
+        v1_index = self.nodes_map[v1].index
+        v2_index = self.nodes_map[v2].index
+
+        return len(self.matrix_adjacency[v1_index][v2_index]) == 1  
 
     def get_edge_count(self):
         return len(self.edges_map)
@@ -248,13 +261,13 @@ class GrafoMA:
         return len(self.matrix_adjacency) - len(self.excluded_nodes_index) == 0
 
     def is_complete(self):
-        size = len(self.matrix_adjacency)
-        for i in range(size):
-            for j in range(size):
-                if i != j and len(self.matrix_adjacency[i][j]) != 1:
+        for v1_name in self.nodes_map.keys():
+            for v2_name in self.nodes_map.keys():
+                if v1_name == v2_name and self.thers_edge_by_nodes(v1_name, v2_name):
                     return False
-                if i == j and len(self.matrix_adjacency[i][j]) != 0:
+                if v1_name != v2_name and not self.thers_only_one_edge_btwn_nodes(v1_name, v2_name):
                     return False
+                
         return True
 
     def is_simple(self):
@@ -279,10 +292,12 @@ class GrafoMA:
             index = index // 26 - 1
         return resultado
 
-    def _fill_nodes_map(self, num_nodes, nodes):
+    def _fill_nodes_map(self, num_nodes: int, nodes: List[Tuple[str, float]], random_graph_generation:bool = False):
         if not nodes:
             for i in range(num_nodes):
-                self.nodes_map[i] = str(i + 1)
+                self.nodes_map[str(i + 1)] = Node(i)
+            if random_graph_generation: self._create_random_edges()
+                    
         elif num_nodes == 0 or len(nodes) == num_nodes:
             self.matrix_adjacency = self._create_matrix(len(nodes))
             for i in range(len(nodes)):
@@ -841,3 +856,13 @@ class GrafoMA:
         edge_name = str(edge_name)
         bridges = self.get_bridge_by_tarjan()
         return edge_name in bridges
+
+    def _create_random_edges(self):
+        for v1_name in self.nodes_map.keys():
+            for v2_name in self.nodes_map.keys():
+                should_add_edge = random.randint(1, 5) == 1
+                v1_index = self.nodes_map[v1_name].index
+                v2_index = self.nodes_map[v2_name].index
+                
+                if v1_index < v2_index and should_add_edge:
+                    self.add_edge(v1_name, v2_name, 1)

@@ -223,8 +223,8 @@ class TestAllGraphDirected(unittest.TestCase):
         self.graphMA.add_node("A", 1.0)
         self.graphMA.add_node("B", 2.0)
         self.graphMA.add_edge("A", "B", 3.0, "edge1")
-        self.assertTrue(self.graphMA.thers_node_adjacente("A", "B"))
-        self.assertFalse(self.graphMA.thers_node_adjacente("B", "A"))
+        self.assertTrue(self.graphMA.thers_node_adjacency("A", "B"))
+        self.assertFalse(self.graphMA.thers_node_adjacency("B", "A"))
 
         self.graphMI.add_node("A", 1.0)
         self.graphMI.add_node("B", 2.0)
