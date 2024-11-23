@@ -416,7 +416,7 @@ class GrafoLA:
         time[0] += 1
         result[node_name].finishing_time = time[0]
 
-    def get_euler_path(self):
+    def get_euler_path(self, by_tarjan: bool = True):
         """
         Get the Euler Path of the graph.
         Returns:
@@ -436,6 +436,7 @@ class GrafoLA:
 
         euler_path: List[str] = []
         copy_graph = copy.deepcopy(self)
+        is_bridge_method = copy_graph.is_bridge_by_tarjan if by_tarjan else copy_graph.is_bridget
 
         nodes_degree = copy_graph.get_all_nodes_degree()
         odd_degree_nodes = [
@@ -459,7 +460,7 @@ class GrafoLA:
                 last_edge = True
             else:
                 for edge_name in edges_of_current_node:
-                    if not copy_graph.is_bridget(edge_name):
+                    if not is_bridge_method(edge_name):
                         chosen_edge = edge_name
                         last_edge = False
                         break
@@ -841,5 +842,10 @@ class GrafoLA:
                 self._tarjan_dfs(node_name, result, bridges, time)
 
         return bridges
+    
+    def is_bridge_by_tarjan(self, edge_name: str):
+        edge_name = str(edge_name)
+        bridges = self.get_bridge_by_tarjan()
+        return edge_name in bridges
 
     # endregion

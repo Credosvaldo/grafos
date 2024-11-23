@@ -795,7 +795,7 @@ class GrafoMI:
 
         return is_bridge
 
-    def get_euler_path(self):
+    def get_euler_path(self, by_tarjan: bool = True):
         if self.is_empty():
             return []
 
@@ -810,6 +810,8 @@ class GrafoMI:
 
         euler_path: List[str] = []
         copy_graph = copy.deepcopy(self)
+        is_bridge_method = copy_graph.is_bridge_by_tarjan if by_tarjan else copy_graph.is_bridget
+
 
         nodes_degree = copy_graph.get_all_nodes_degree()
         odd_degree_nodes = [
@@ -833,7 +835,7 @@ class GrafoMI:
                 is_bridge = True
             else:
                 for edge in edges_of_current_node:
-                    if not copy_graph.is_brige(edge):
+                    if not is_bridge_method(edge):
                         chosen_edge = edge
                         break
 
@@ -963,3 +965,8 @@ class GrafoMI:
                 self._tarjan_dfs(node_name, result, bridges, time)
 
         return bridges
+    
+    def is_bridge_by_tarjan(self, edge_name: str):
+        edge_name = str(edge_name)
+        bridges = self.get_bridge_by_tarjan()
+        return edge_name in bridges
