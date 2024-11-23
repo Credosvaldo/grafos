@@ -723,3 +723,6 @@ class GrafoMI:
             for v1, v2, weight, edge_name in edges_to_remove:
                 graph_copy.add_edge(v1, v2, weight, edge_name)
         return articulations
+
+    def is_connected(self):
+        return self._non_directed_connectivity_degree()
