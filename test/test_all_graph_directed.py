@@ -305,6 +305,27 @@ class TestAllGraphDirected(unittest.TestCase):
 
         self.assertEqual(self.graphMA.kosaraju(), self.graphMI.kosaraju())
 
+    def test_connectivity_degree(self):
+        self.graphMA.add_edge(1, 2, 1)
+        self.graphMA.add_edge(2, 5, 1)
+        self.graphMA.add_edge(5, 3, 1)
+        self.graphMA.add_edge(3, 1, 1)
+
+        self.graphMA.add_edge(1, 4, 1)
+        self.graphMA.add_edge(4, 6, 1)
+        self.graphMA.add_edge(3, 6, 1)
+
+        self.graphMA.add_edge(5, 7, 1)
+        self.graphMA.add_edge(6, 7, 1)
+        self.graphMA.add_edge(7, 6, 1)
+        self.graphMA.to_xml()
+
+        self.graphMI.to_graph("output/graphMA.gexf")
+
+        self.assertEqual(
+            self.graphMA.connectivity_degree(), self.graphMI.connectivity_degree()
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

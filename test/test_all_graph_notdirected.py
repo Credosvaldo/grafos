@@ -78,6 +78,7 @@ class TestAllGraphNotDirected(unittest.TestCase):
         self.assertEqual(self.graphLA.get_euler_path(), self.graphMA.get_euler_path())
         # self.assertEqual(self.graphMA.get_euler_path(), self.graphMI.get_euler_path())
     
+    
 
 if __name__ == "__main__":
     unittest.main()
