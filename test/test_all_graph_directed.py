@@ -251,22 +251,6 @@ class TestAllGraphDirected(unittest.TestCase):
         self.assertTrue(self.graphMI.thers_edge_by_name("edge1"))
         self.assertFalse(self.graphMI.thers_edge_by_name("edge2"))
 
-    # def test_to_graph(self):
-    #     self.graphLA.add_node("A", 1.0)
-    #     self.graphLA.add_node("B", 2.0)
-    #     self.graphLA.add_edge("A", "B", 3.0, "edge1")
-    #     self.graphLA.to_graph("output/graphLA.gexf")
-
-    #     self.graphMA.add_node("A", 1.0)
-    #     self.graphMA.add_node("B", 2.0)
-    #     self.graphMA.add_edge("A", "B", 3.0, "edge1")
-    #     self.graphMA.to_graph("output/graphMA.gexf")
-
-    #     self.graphMI.add_node("A", 1.0)
-    #     self.graphMI.add_node("B", 2.0)
-    #     self.graphMI.add_edge("A", "B", 3.0, "edge1")
-    #     self.graphMI.to_graph("output/graphMI.gexf")
-
     def test_print_revert_graph(self):
         self.graphLA.add_node("A", 1.0)
         self.graphLA.add_node("B", 2.0)
@@ -300,6 +284,7 @@ class TestAllGraphDirected(unittest.TestCase):
         self.assertEqual(
             self.graphMI.get_all_nodes_degree(), {"A": 1, "B": 0}
         )  # TODO: Check this implementation, probably is wrong
+
 
 if __name__ == "__main__":
     unittest.main()

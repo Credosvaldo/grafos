@@ -178,6 +178,7 @@ class GrafoMI:
         self._recreate_matrix()
 
     def add_node(self, name: str, weight: float = 1):
+        name = str(name)
         if name in self.nodes_map:
             raise ValueError(f"Já existe um nó com o nome {name}")
 
@@ -192,6 +193,7 @@ class GrafoMI:
     def remove_node(self, name: str):
         name = str(name)
 
+        print(self.nodes_map)
         if name not in self.nodes_map:
             raise ValueError("Node name does not exist")
 
@@ -756,7 +758,7 @@ class GrafoMI:
             )  # Retorna a aresta ao grafo copia
 
         return bridges
-    
+
     def get_all_nodes_degree(self):
         nodes_degree: Dict[str, int] = {}
         for node_name in self.nodes_map.keys():
@@ -765,60 +767,62 @@ class GrafoMI:
                 if node_name in edge_info[:2]:
                     nodes_degree[node_name] += 1
         return nodes_degree
-    
+
     def get_edges_by_node(self, node_name: str):
         edges = []
         for edge_name, edge_info in self.edges_map.items():
             if node_name in edge_info[:2]:
                 edges.append(edge_name)
         return edges
-    
+
     def is_brige(self, edge_name: str):
         if edge_name not in self.edges_map:
             raise ValueError("Edge name does not exist")
-        
+
         copy_graph = (
             self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
         )
-        
+
         copy_graph.remove_edge_by_name(edge_name)
 
         is_bridge = not copy_graph.is_connected()
 
         return is_bridge
-    
+
     def get_euler_path(self):
         if self.is_empty():
             return []
-        
+
         if not self.is_connected():
             return []
-        
+
         if not self.is_simple():
             raise ValueError("Graph is not simple")
-        
+
         if self.DIRECTED:
             raise ValueError("Graph is directed")
 
         euler_path: List[str] = []
         copy_graph = copy.deepcopy(self)
-        
+
         nodes_degree = copy_graph.get_all_nodes_degree()
         odd_degree_nodes = [
             node for node, degree in nodes_degree.items() if degree % 2 != 0
         ]
-        
+
         if len(odd_degree_nodes) >= 3:
             return []
-        
+
         current_node = (
-            odd_degree_nodes[0] if len(odd_degree_nodes) == 1 else next(iter(nodes_degree.keys()))
+            odd_degree_nodes[0]
+            if len(odd_degree_nodes) == 1
+            else next(iter(nodes_degree.keys()))
         )
-        
+
         while copy_graph.get_edge_count() > 0:
             euler_path.append(current_node)
             edges_of_current_node = copy_graph.get_edges_by_node(current_node)
-            
+
             is_bridge = False
             if len(edges_of_current_node) == 1:
                 chosen_edge = edges_of_current_node[0]
@@ -828,7 +832,7 @@ class GrafoMI:
                     if not copy_graph.is_brige(edge):
                         chosen_edge = edge
                         break
-            
+
             v1, v2, _, _ = copy_graph.edges_map[chosen_edge]
             if is_bridge:
                 copy_graph.remove_node(current_node)
