@@ -819,9 +819,7 @@ class GrafoMI:
             return []
 
         current_node = (
-            odd_degree_nodes[0]
-            if len(odd_degree_nodes) == 1
-            else next(iter(nodes_degree.keys()))
+            odd_degree_nodes[0] if odd_degree_nodes else next(iter(self.nodes_map))
         )
 
         while copy_graph.get_edge_count() > 0:
