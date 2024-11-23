@@ -709,7 +709,7 @@ class GrafoMI:
             ]
             edges_to_remove = []
             for edge_name in edges_names_to_remove:
-                v1, v2, weight = graph_copy.edges_map[edge_name]
+                v1, v2, _, weight = graph_copy.edges_map[edge_name]
                 edges_to_remove.append((v1, v2, weight, edge_name))
 
             graph_copy.remove_node(node_name)  # remove o nó
@@ -726,12 +726,12 @@ class GrafoMI:
 
     def is_connected(self):
         return self._non_directed_connectivity_degree()
-    
+
     def get_bridge(self):
         if self.is_empty():
-            return [] # se o grafo for vazio não tem como ter pontes
+            return []  # se o grafo for vazio não tem como ter pontes
 
-        bridges = [] # lista de pontes
+        bridges = []  # lista de pontes
         graph_copy = (
             self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
         )
@@ -739,7 +739,7 @@ class GrafoMI:
         # verifica se o grafo já não é deconexo (não tem pontes)
         if not graph_copy._non_directed_connectivity_degree():
             return bridges
-        
+
         # Faz uma cópia das chaves das arestas para evitar modificar durante a iteração
         edges = list(graph_copy.edges_map.items())
 
@@ -747,9 +747,13 @@ class GrafoMI:
         for edge_name, edge_info in edges:
             v1, v2, index, weight = edge_info  # Pega as informações da aresta
             graph_copy.remove_edge_by_name(edge_name)  # Remove a aresta
-            if not graph_copy._non_directed_connectivity_degree():  # Se o grafo deixou de ser conexo
+            if (
+                not graph_copy._non_directed_connectivity_degree()
+            ):  # Se o grafo deixou de ser conexo
                 bridges.append(edge_name)  # É ponte
-            graph_copy.add_edge(v1, v2, weight, edge_name)  # Retorna a aresta ao grafo copia
+            graph_copy.add_edge(
+                v1, v2, weight, edge_name
+            )  # Retorna a aresta ao grafo copia
 
         return bridges
     

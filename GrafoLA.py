@@ -35,6 +35,9 @@ class GrafoLA:
                     if predecessor == node and successor == neighbor.name:
                         result += f"[{neighbor.name } ({weight})] -> "
                         break
+                    elif not self.DIRECTED and predecessor == neighbor.name:
+                        result += f"[{neighbor.name } ({weight})] -> "
+                        break
 
             result += "\n"
         return result
@@ -70,7 +73,7 @@ class GrafoLA:
             self.add_edge(edge[0], edge[1], edge[2])
 
     # region Node Section
-    def add_node(self, name: str, weight: float = 0):
+    def add_node(self, name: str, weight: float = 1.0):
         """
         Adds a new node to the graph.
 
@@ -152,9 +155,9 @@ class GrafoLA:
         successor = str(successor)
 
         if predecessor not in self.list_adjacency:
-            self.add_node(predecessor, None)
+            self.add_node(predecessor)
         if successor not in self.list_adjacency:
-            self.add_node(successor, None)
+            self.add_node(successor)
 
         if name in self.edges_map:
             raise ValueError("Edge already exist")
@@ -168,7 +171,7 @@ class GrafoLA:
         name = str(name)
         self.list_adjacency[predecessor].append(self.nodes_map[successor])
 
-        if not self.DIRECTED and predecessor != successor:
+        if not self.DIRECTED:
             self.list_adjacency[successor].append(self.nodes_map[predecessor])
 
         self.edges_map[name] = (predecessor, successor, weight)
@@ -464,6 +467,9 @@ class GrafoLA:
         Returns:
             List[Edges]: A list with all bridge edges name.
         """
+        if not self.is_connected():
+            raise ValueError("Graph is not connected")
+
         if self.is_empty():
             return []
 
@@ -503,6 +509,8 @@ class GrafoLA:
         return is_bridge
 
     def get_articulations(self):
+        if not self.is_connected():
+            raise ValueError("Graph is not connected")
 
         if self.is_empty():
             return []
