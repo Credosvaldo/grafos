@@ -68,7 +68,18 @@ print(graphMI)
 print(graphMa)
 print(graphMI)
 
-
+# TARJAN
+# a = GrafoMA(DIRECTED=False)
+# a.add_edge(1, 2, 7)
+# a.add_edge(2, 3, 7)
+# a.add_edge(2, 5, 7)
+# a.add_edge(3, 4, 7)
+# a.add_edge(3, 6, 7)
+# a.add_edge(7, 4, 7)
+# a.add_edge(7, 6, 7)
+# a.add_edge(4, 6, 7)
+# print(a)
+# print(a.get_bridge_by_tarjan())
 
 
 
