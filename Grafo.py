@@ -75,9 +75,6 @@ class Grafo:
     def make_revert_graph(self):
         pass
 
-    def print_revert_graph(self):
-        pass
-
     def make_underlying_graph(self):
         pass
 

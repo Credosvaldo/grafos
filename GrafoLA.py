@@ -498,11 +498,6 @@ class GrafoLA:
 
         return new_graph
 
-    def print_revert_graph(self):
-        aux = self.make_revert_graph()
-        print("Revert Graph")
-        print(aux)
-
     def kosaraju(self):
         if not self.DIRECTED:
             raise ValueError("Graph is not directed")

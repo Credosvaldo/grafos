@@ -341,11 +341,6 @@ class GrafoMA:
 
         return new_graph
 
-    def print_revert_graph(self):
-        aux = self.make_revert_graph()
-        print("Revert Graph")
-        print(str(aux))
-
     def make_underlying_graph(self):
 
         if not self.DIRECTED:

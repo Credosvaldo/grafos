@@ -429,10 +429,6 @@ class GrafoMI(Grafo):
 
         return new_graph
 
-    def print_revert_graph(self):
-        print("Rever Graph:")
-        print(self.make_revert_graph())
-
     def make_underlying_graph(self):
         # faz o grafo subjacente, ou seja, transforma um grafo direcionado em não dir
         # Se já for não direcionado lança erro
