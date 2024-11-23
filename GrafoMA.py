@@ -1,5 +1,6 @@
 from multiprocessing import Process, Manager
 from typing import Dict, List, Tuple
+from models.TarjansNode import TarjansNode
 from models.DFSNode import DFSNode
 from models.Edge import Edge
 from models.ExcludedEdge import ExcludedEdge
@@ -573,18 +574,25 @@ class GrafoMA:
         while copy_graph.get_edge_count() > 0:
             euler_path.append(current_node)
             edges_of_current_node = copy_graph.get_edges_by_node(current_node)
+            last_edge = False
 
             if len(edges_of_current_node) == 1:
                 chosen_edge = edges_of_current_node[0]
+                last_edge = True
             else:
                 for edge_name in edges_of_current_node:
                     if not copy_graph.is_bridget(edge_name):
                         chosen_edge = edge_name
+                        last_edge = False
                         break
 
             v1, v2, _ = copy_graph.edges_map[chosen_edge]
-            copy_graph.remove_edge_by_name(chosen_edge)
             current_node = v2 if v1 == current_node else v1
+            
+            if last_edge:
+                copy_graph.remove_node(current_node)
+            else:
+                copy_graph.remove_edge_by_name(chosen_edge)
 
         if copy_graph.get_edge_count() != 0:
             raise ValueError("Graph has more than one connected component")
@@ -734,3 +742,53 @@ class GrafoMA:
                 number_of_strongly_connected_components+=1 
         
         return number_of_strongly_connected_components
+
+    def _tarjan_dfs(self, node_name: str, result: Dict[str, TarjansNode], bridges: List[str], time: List[int]):
+        result[node_name].visited = True
+        result[node_name].disc = time[0]
+        result[node_name].low = time[0]
+        time[0] += 1
+        
+        node_index = self.nodes_map[node_name].index
+
+        for v in self.matrix_adjacency[node_index]:
+            edge = v[0]
+            v1, v2, _ = self.edges_map[edge.name]
+            neibor = v2 if v1 == node_name else v1
+            
+            if not result[neibor].visited:
+                result[neibor].parent = node_name
+                
+                self._tarjan_dfs(neibor, result, bridges, time)
+
+                result[node_name].low = min(result[node_name].low, result[neibor].low)
+
+                if result[neibor].low > result[node_name].disc:
+                    bridges.append(edge.name)
+                    
+            elif neibor != result[node_name].parent:
+                result[node_name].low = min(result[node_name].low, result[neibor].disc)
+
+    def get_bridge_by_tarjan(self):
+        if not self.is_connected():
+            raise ValueError("Graph is not connected")
+        
+        if self.is_empty():
+            return []
+
+        time = [0]
+        bridges: List[str] = []
+        copy_graph = (
+            self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
+        )
+
+        result: Dict[str, TarjansNode] = {}
+        
+        for node_name in self.nodes_map.keys():
+            result[node_name] = TarjansNode(False, None, 0, 0)
+            
+        for node_name in copy_graph.nodes_map.keys():
+            if not result[node_name].visited:
+                self._tarjan_dfs(node_name, result, bridges, time)
+
+        return bridges
