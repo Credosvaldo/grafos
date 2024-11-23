@@ -1,5 +1,6 @@
 from multiprocessing import Process, Manager
 from typing import Dict, List, Tuple
+from enums.ConnectivityDegree import ConnectivityDegree
 from models.TarjansNode import TarjansNode
 from models.DFSNode import DFSNode
 from models.Edge import Edge
@@ -365,10 +366,7 @@ class GrafoMA:
     def _depth_first_search(self):
 
         time = [0]
-        result: Dict[str, DFSNode] = {}
-
-        for node_name in self.nodes_map.keys():
-            result[node_name] = DFSNode(0, 0, None)
+        result = self._get_dfs_result_structure()
 
         for node_name, node_value in result.items():
             if node_value.discovery_time == 0:
@@ -400,7 +398,34 @@ class GrafoMA:
         result[node_name].finishing_time = time[0]
 
     def connectivity_degree(self):
-        graph = self.make_underlying_graph()
+        if not self.is_connected():
+            return ConnectivityDegree.DISCONNECTED
+        
+        if self.kosaraju() == 1:
+            return ConnectivityDegree.STRONGLY_CONNECTED
+        
+        results: Dict[str, Dict[str, DFSNode]] = {}
+        
+        for v1_name in self.nodes_map.keys():
+            for v2_name in self.nodes_map.keys():
+                if v1_name != v2_name:
+                    v1_to_v2 = self.reachable(v1_name, v2_name, results)
+                    v2_to_v1 = self.reachable(v2_name, v1_name, results)
+                    if not (v1_to_v2 or v2_to_v1):
+                        return ConnectivityDegree.WEAKLY_CONNECTED
+                    
+        return ConnectivityDegree.UNIDIRECTIONAL_CONNECTED
+            
+        
+    def reachable(self, v1: str, v2: str, results: Dict[str, Dict[str, DFSNode]]):
+        v1 = str(v1)
+        v2 = str(v2)
+
+        if v1 not in results.keys():
+            result = self._get_dfs_result_structure()
+            results[v1] = self._dfs(v1, [0], result)
+        
+        return results[v1][v2].discovery_time != 0
 
     def is_connected(self):
         """
@@ -416,10 +441,7 @@ class GrafoMA:
             return graph.is_connected()
 
         time = [0]
-        result: Dict[str, DFSNode] = {}
-
-        for node_name in self.nodes_map.keys():
-            result[node_name] = DFSNode(0, 0, None)
+        result = self._get_dfs_result_structure()
 
         first_node = next(iter(self.nodes_map))
         self._dfs(first_node, time, result)
@@ -728,10 +750,7 @@ class GrafoMA:
         sorted_keys = sorted(dfs.keys(), reverse=True, key=lambda k: dfs[k].finishing_time)
         
         time = [0]
-        result: Dict[str, DFSNode] = {}
-
-        for key in sorted_keys:
-            result[key] = DFSNode(0, 0, None)
+        result = self._get_dfs_result_structure(sorted_keys)
 
         for key in sorted_keys:
             if result[key].discovery_time == 0:
@@ -772,7 +791,7 @@ class GrafoMA:
             elif neibor != result[node_name].parent:
                 result[node_name].low = min(result[node_name].low, result[neibor].disc)
 
-    def get_bridge_by_tarjan(self):
+    def get_bridge_by_tarjan(self):      
         if not self.is_connected():
             raise ValueError("Graph is not connected")
         
@@ -795,3 +814,12 @@ class GrafoMA:
                 self._tarjan_dfs(node_name, result, bridges, time)
 
         return bridges
+    
+    def _get_dfs_result_structure(self, nodes_group: List[str] = None):
+        if nodes_group == None:
+            nodes_group = self.nodes_map.keys()
+            
+        result: Dict[str, DFSNode] = {}
+        for node_name in nodes_group:
+            result[node_name] = DFSNode(0, 0, None)
+        return result
