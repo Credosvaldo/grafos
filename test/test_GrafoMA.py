@@ -87,6 +87,58 @@ class TestGrafoMA(unittest.TestCase):
         self.assertEqual(new_graph.get_node_count(), 3)
         self.assertEqual(new_graph.get_edge_count(), 0)
 
+    def test_is_empty(self):
+        self.assertTrue(self.graph.is_empty())
+        self.graph.add_node("F")
+        self.assertFalse(self.graph.is_empty())
+
+    def test_is_complete(self):
+        self.graph.add_node("F")
+        self.graph.add_node("AS")
+        self.graph.add_edge("F", "AS")
+        self.assertFalse(self.graph.is_complete())
+        self.graph.add_edge("AS", "A")
+        self.assertTrue(self.graph.is_complete())
+
+    def test_is_simple(self):
+        self.graph.add_node("F")
+        self.graph.add_node("AS")
+        self.graph.add_edge("F", "AS")
+        self.assertTrue(self.graph.is_simple())
+        self.graph.add_edge("F", "AS", name="edge2")
+        self.assertFalse(self.graph.is_simple())
+
+    def test_get_all_nodes_degree(self):
+        self.graph.add_node("F")
+        self.graph.add_node("AS")
+        self.graph.add_edge("F", "AS")
+        degrees = self.graph.get_all_nodes_degree()
+        self.assertEqual(degrees["A"], 1)
+        self.assertEqual(degrees["AS"], 1)
+
+    def test_get_edges_by_node(self):
+        self.graph.add_node("F")
+        self.graph.add_node("AS")
+        self.graph.add_edge("F", "AS", name="edge1")
+        edges = self.graph.get_edges_by_node("F")
+        self.assertEqual(edges, ["edge1"])
+
+    def test_is_bridge(self):
+        self.graph.add_node("F")
+        self.graph.add_node("AS")
+        self.graph.add_edge("F", "AS", name="edge1")
+        self.assertTrue(self.graph.is_bridget("edge1"))
+
+    def test_get_euler_path(self):
+        self.graph = GrafoMA(DIRECTED=False)
+        self.graph.add_node("F")
+        self.graph.add_node("AS")
+        self.graph.add_node("C")
+        self.graph.add_edge("F", "AS")
+        self.graph.add_edge("AS", "C")
+        self.graph.add_edge("C", "A")
+        self.assertEqual(self.graph.get_euler_path(), ["F", "AS", "C"])
+
 
 if __name__ == "__main__":
     unittest.main()
