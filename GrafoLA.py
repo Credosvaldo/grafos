@@ -70,7 +70,7 @@ class GrafoLA:
             self.add_edge(edge[0], edge[1], edge[2])
 
     # region Node Section
-    def add_node(self, name: str, weight: float = 0):
+    def add_node(self, name: str, weight: float = 1.0):
         """
         Adds a new node to the graph.
 
@@ -152,9 +152,9 @@ class GrafoLA:
         successor = str(successor)
 
         if predecessor not in self.list_adjacency:
-            self.add_node(predecessor, None)
+            self.add_node(predecessor)
         if successor not in self.list_adjacency:
-            self.add_node(successor, None)
+            self.add_node(successor)
 
         if name in self.edges_map:
             raise ValueError("Edge already exist")
