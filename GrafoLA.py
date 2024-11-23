@@ -30,7 +30,12 @@ class GrafoLA:
         for node in self.list_adjacency:
             result += f"{node} -> "
             for neighbor in self.list_adjacency[node]:
-                result += f"[{neighbor.name}] -> "
+                for key in self.edges_map:
+                    predecessor, successor, weight = self.edges_map[key]
+                    if predecessor == node and successor == neighbor.name:
+                        result += f"[{neighbor.name } ({weight})] -> "
+                        break
+
             result += "\n"
         return result
 

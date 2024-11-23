@@ -4,7 +4,7 @@ from models.Edge import Edge
 from models.Node import Node
 import xmltodict
 from multiprocessing import Process
-
+import copy
 
 
 class GrafoMI:
@@ -19,7 +19,7 @@ class GrafoMI:
             num_nodes
         )  # eixo X são as arestas e o eixo Y são os vertices
         self.nodes_map: Dict[str, Node] = {}  # associando o nome do nó com o nó
-        self.edges_map: Dict[str, Tuple[str, str, int]] = (
+        self.edges_map: Dict[str, Tuple[str, str, int, float]] = (
             {}
         )  # associando o nome da aresta com o nome dos nós na ponta e o indice da aresta (ou seja, qual coluna ela representa)
         self.DIRECTED = DIRECTED  # Direcionado ou não
@@ -111,12 +111,12 @@ class GrafoMI:
         # Criando a nova aresta
         new_edge = Edge(name=name, weight=weight)
         self.matrix_incidency[v1_index][new_edge_index] = Edge(
-            name=name, weight=-weight if self.DIRECTED else weight
+            name=name, weight=-1 if self.DIRECTED else 1
         )
-        self.matrix_incidency[v2_index][new_edge_index] = Edge(name=name, weight=weight)
+        self.matrix_incidency[v2_index][new_edge_index] = Edge(name=name, weight=1)
 
         # Atualizando o mapeamento de arestas
-        self.edges_map[name] = (v1, v2, new_edge_index)
+        self.edges_map[name] = (v1, v2, new_edge_index, weight)
 
     def remove_edge_by_name(self, name: str):
         name = str(name)
@@ -125,7 +125,7 @@ class GrafoMI:
         if name not in self.edges_map:
             raise ValueError("Edge name does not exist")
 
-        _, _, edge_index = self.edges_map[name]  # Pegando o índice da aresta
+        _, _, edge_index, _ = self.edges_map[name]  # Pegando o índice da aresta
         # Remove a aresta da matriz de incidência (ou seja, apaga a coluna de cada linha)
         for row in self.matrix_incidency:
             row.pop(edge_index)
@@ -239,6 +239,7 @@ class GrafoMI:
                 self.edges_map[edge_name][0],
                 self.edges_map[edge_name][1],
                 j,
+                self.edges_map[edge_name][3],
             )
 
     def thers_node_adjacente(self, predecessor: str, sucessor: str):
@@ -331,16 +332,16 @@ class GrafoMI:
     def is_simple(self):
         # Verificar se há laços
         for edge_name, edge_info in self.edges_map.items():
-            v1, v2, edge_index = edge_info
+            v1, v2, edge_index, _ = edge_info
             if v1 == v2:
                 return False
 
         # Verificar se há arestas paralelas
         for edge_name, edge_info in self.edges_map.items():
-            v1, v2, edge_index = edge_info
+            v1, v2, edge_index, _ = edge_info
             for other_edge_name, other_edge_info in self.edges_map.items():
                 if edge_name != other_edge_name:
-                    other_v1, other_v2, _ = other_edge_info
+                    other_v1, other_v2, _, _ = other_edge_info
                     if self.DIRECTED:
                         # Verificar se as arestas têm os mesmos dois vértices, na mesma direção
                         if v1 == other_v1 and v2 == other_v2:
@@ -385,7 +386,7 @@ class GrafoMI:
 
         # adiciona as arestas trocando sucessor por predecessor
         for edge_name, edge_info in self.edges_map.items():
-            v1, v2, edge_index = edge_info
+            v1, v2, edge_index, _ = edge_info
             # troca o sinal do peso da aresta pq como é direcionado o peso da aresta saindo de v1 tá negativo
             edge_weight = (
                 self.matrix_incidency[self.nodes_map[v1].index][edge_index].weight * -1
@@ -413,7 +414,7 @@ class GrafoMI:
 
         # adiciona as arestas ao grafo subjacente
         for edge_name, edge_info in self.edges_map.items():
-            v1, v2, edge_index = edge_info
+            v1, v2, edge_index, _ = edge_info
             # troca o sinal do peso da aresta pq como é direcionado o peso da aresta saindo de v1 tá negativo
             edge_weight = (
                 self.matrix_incidency[self.nodes_map[v1].index][edge_index].weight * -1
@@ -426,7 +427,7 @@ class GrafoMI:
         aux = self.make_underlying_graph()
         print("Underlying Graph")
         print(str(aux))
-        
+
     def _non_directed_connectivity_degree(self):
         # Inicializa um conjunto para nós visitados
         visited = set()
@@ -507,10 +508,10 @@ class GrafoMI:
                     # então o grafo é no máximo semi-fortemente conexo
                     # não dou um early return aqui pq pode ser que algum nó futuro não alcance nem seja alcançado por algum nó
                     semifortemente = True
-            
-            if semifortemente:        
-                return "Semi-fortemente Conexo" # se todos os nós são alcançados por todos é semi-fortemente conexo
-            return "Fortemente Conexo" # se todos alcançam todos é fortemente conexo
+
+            if semifortemente:
+                return "Semi-fortemente Conexo"  # se todos os nós são alcançados por todos é semi-fortemente conexo
+            return "Fortemente Conexo"  # se todos alcançam todos é fortemente conexo
 
     def _depth_first_search(self):
         # inicializa o tempo zerado
@@ -521,22 +522,24 @@ class GrafoMI:
             result[node_name] = DFSNode(0, 0, None)
 
         # para cada nó que não foi visitado, fazemos uma busca em profundidade
-        numbers_of_trees = 0 # numero de arvores (para o kosaraju)
+        numbers_of_trees = 0  # numero de arvores (para o kosaraju)
         for node_name, node_value in result.items():
             if node_value.discovery_time == 0:
                 self._dfs(node_name, time, result)
 
         return result
-    
+
     def _dfs(self, node_name: str, time: list[int], result: Dict[str, DFSNode]):
         node_name = str(node_name)
         # Soma um ao contador global
         time[0] += 1
         # Atribui o tempo de descoberta do nó
         result[node_name].discovery_time = time[0]
-        
+
         # Para cada coluna da matriz
-        for edge_index, edge in enumerate(self.matrix_incidency[self.nodes_map[node_name].index]):
+        for edge_index, edge in enumerate(
+            self.matrix_incidency[self.nodes_map[node_name].index]
+        ):
             # se há uma aresta saindo do nó em analise
             if edge:
                 # Pega o nome do nó que a aresta liga
@@ -549,7 +552,6 @@ class GrafoMI:
         # Chegando no final da busca em profundidade, incrementamos o contador global e atribuimos o TT
         time[0] += 1
         result[node_name].finishing_time = time[0]
-
 
     def _get_reachable_nodes(self, start_node_name):
         # Busca em profundidade para pegar todos os nós alcançáveis a partir de um nó inicial
@@ -650,7 +652,8 @@ class GrafoMI:
 
     def __writeEdge(self, edge: str):
 
-        predecessor, successor, weight = self.edges_map[edge]
+        predecessor, successor, _, weight = self.edges_map[edge]
+
         result = f"<edge label='{edge}' source='{predecessor}' target='{successor}' weight='{weight}'/>\n"
 
         return result
@@ -666,15 +669,15 @@ class GrafoMI:
         # Depois fazemos uma busca em profundidade no grafo reverso em ordem decrescente de TT
         # pegar os nós em ordem decrescente de TT
         sorted_nodes = sorted(
-            dfs_result.items(),
-            key=lambda item: item[1].finishing_time,
-            reverse=True
+            dfs_result.items(), key=lambda item: item[1].finishing_time, reverse=True
         )
         sorted_node_names = [node_name for node_name, _ in sorted_nodes]
-        
-        visited = set() # nós visitados
-        strongly_connected_components = [] # componentes (conjuntos de vértices) fortemente conexos
-        
+
+        visited = set()  # nós visitados
+        strongly_connected_components = (
+            []
+        )  # componentes (conjuntos de vértices) fortemente conexos
+
         for node_name in sorted_node_names:
             if node_name not in visited:
                 # Executar busca em profundidade para encontrar todos os nós alcançáveis
@@ -683,3 +686,43 @@ class GrafoMI:
                 visited.update(reachable_nodes)
 
         return strongly_connected_components
+
+    def get_articulations(self):  # metodo "naive" de verificar se é articulação
+        if self.is_empty():  # se o grafo for vazio não tem como ter articulações
+            return []
+
+        articulations = []  # lista de articulações
+        graph_copy = (
+            self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
+        )  # copia do grafo para não alterar o original
+
+        # verifica se o grafo já não é deconexo (não tem articulações)
+        if not graph_copy._non_directed_connectivity_degree():
+            return articulations
+
+        for node_name in self.nodes_map.keys():  # para cada nó do grafo
+            # salva as arestas que vão ser removidas ao remover o nó
+            edges_names_to_remove = [
+                edge_name
+                for edge_name, edge_info in graph_copy.edges_map.items()
+                if node_name in edge_info[:2]
+            ]
+            edges_to_remove = []
+            for edge_name in edges_names_to_remove:
+                v1, v2, weight = graph_copy.edges_map[edge_name]
+                edges_to_remove.append((v1, v2, weight, edge_name))
+
+            graph_copy.remove_node(node_name)  # remove o nó
+            if (
+                not graph_copy._non_directed_connectivity_degree()
+            ):  # se o grafo deixou de ser conexo
+                articulations.append(node_name)  # era articulação
+            graph_copy.add_node(node_name)  # retorna o nó para o grafo copia
+
+            # retorna as arestas removidas
+            for v1, v2, weight, edge_name in edges_to_remove:
+                graph_copy.add_edge(v1, v2, weight, edge_name)
+        return articulations
+
+    def is_connected(self):
+        return self._non_directed_connectivity_degree()
