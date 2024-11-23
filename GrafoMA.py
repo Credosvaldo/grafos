@@ -560,7 +560,7 @@ class GrafoMA:
 
         return excluded_edges
 
-    def get_euler_path(self):
+    def get_euler_path(self, by_tarjan: bool = True):
         """
         Get the Euler Path of the graph.
         Returns:
@@ -577,9 +577,11 @@ class GrafoMA:
 
         if self.DIRECTED:
             raise ValueError("Graph is directed")
+        
 
         euler_path: List[str] = []
         copy_graph = copy.deepcopy(self)
+        is_bridge_method = copy_graph.is_bridge_by_tarjan if by_tarjan else copy_graph.is_bridget
 
         nodes_degree = copy_graph.get_all_nodes_degree()
         odd_degree_nodes = [
@@ -603,7 +605,7 @@ class GrafoMA:
                 last_edge = True
             else:
                 for edge_name in edges_of_current_node:
-                    if not copy_graph.is_bridget(edge_name):
+                    if not is_bridge_method(edge_name):
                         chosen_edge = edge_name
                         last_edge = False
                         break
@@ -832,3 +834,8 @@ class GrafoMA:
         for node_name in nodes_group:
             result[node_name] = DFSNode(0, 0, None)
         return result
+
+    def is_bridge_by_tarjan(self, edge_name: str):
+        edge_name = str(edge_name)
+        bridges = self.get_bridge_by_tarjan()
+        return edge_name in bridges
