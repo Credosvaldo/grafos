@@ -79,6 +79,19 @@ class TestAllGraphNotDirected(unittest.TestCase):
         self.assertEqual(self.graphMA.get_euler_path(), self.graphMI.get_euler_path())
     
     
+    def test_tarjan(self):
+        a = GrafoMA(DIRECTED=False)
+        a.add_edge(1, 2, 7)
+        a.add_edge(2, 3, 7)
+        a.add_edge(2, 5, 7)
+        a.add_edge(3, 4, 7)
+        a.add_edge(3, 6, 7)
+        a.add_edge(7, 4, 7)
+        a.add_edge(7, 6, 7)
+        a.add_edge(4, 6, 7)
+        print(a)
+        print(a.get_bridge_by_tarjan())
+
 
 if __name__ == "__main__":
     unittest.main()
