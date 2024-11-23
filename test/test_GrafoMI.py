@@ -155,7 +155,7 @@ class TestGrafoMI(unittest.TestCase):
     def test_is_connected(self):
         self.graph.add_node("A")
         self.graph.add_node("B")
-        self.graph.add_edge("A", "B")
+        self.graph.add_edge("A", "B", name="edge1")
         self.assertTrue(self.graph.is_connected())
         self.graph.remove_edge_by_name("edge1")
         self.assertFalse(self.graph.is_connected())

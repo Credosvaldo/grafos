@@ -76,7 +76,7 @@ class TestAllGraphNotDirected(unittest.TestCase):
         self.graphMA.add_edge(1, 2, 7)
         self.graphMI.add_edge(1, 2, 7)
         self.assertEqual(self.graphLA.get_euler_path(), self.graphMA.get_euler_path())
-        # self.assertEqual(self.graphMA.get_euler_path(), self.graphMI.get_euler_path())
+        self.assertEqual(self.graphMA.get_euler_path(), self.graphMI.get_euler_path())
     
     
 
