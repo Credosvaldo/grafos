@@ -129,7 +129,7 @@ class GrafoLA:
             if neighbor.name == successor:
                 return True
         return False
-    
+
     def thers_only_one_edge_btwn_nodes(self, predecessor: str, successor: str):
         v1 = str(predecessor)
         v2 = str(successor)
@@ -141,12 +141,12 @@ class GrafoLA:
         for neighbor in self.list_adjacency[predecessor]:
             if neighbor.name != successor:
                 continue
-            
+
             if thers_edge:
                 return False
             else:
                 thers_edge = True
-                
+
         return thers_edge
 
     def get_all_nodes_degree(self):
@@ -348,7 +348,9 @@ class GrafoLA:
             for key in self.nodes_map:
                 if node_key == key and self.thers_node_adjacency(node_key, key):
                     return False
-                if node_key != key and not self.thers_only_one_edge_btwn_nodes(node_key, key):
+                if node_key != key and not self.thers_only_one_edge_btwn_nodes(
+                    node_key, key
+                ):
                     return False
 
         return True
@@ -424,7 +426,9 @@ class GrafoLA:
 
         euler_path: List[str] = []
         copy_graph = copy.deepcopy(self)
-        is_bridge_method = copy_graph.is_bridge_by_tarjan if by_tarjan else copy_graph.is_bridge
+        is_bridge_method = (
+            copy_graph.is_bridge_by_tarjan if by_tarjan else copy_graph.is_bridge
+        )
 
         nodes_degree = copy_graph.get_all_nodes_degree()
         odd_degree_nodes = [
@@ -705,7 +709,8 @@ class GrafoLA:
         result += "</graph>\n"
         result += "</gexf>\n"
 
-        open("output/graphLA.gexf", "w").write(result)
+        with open("output/graphLA.gexf", "w") as file:
+            file.write(result)
 
     def __writeGraph(self):
         result = '<attributes class="node">\n'
@@ -826,7 +831,7 @@ class GrafoLA:
                 self._tarjan_dfs(node_name, result, bridges, time)
 
         return bridges
-    
+
     def is_bridge_by_tarjan(self, edge_name: str):
         edge_name = str(edge_name)
         bridges = self.get_bridge_by_tarjan()

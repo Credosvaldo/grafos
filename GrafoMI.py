@@ -655,7 +655,8 @@ class GrafoMI(Grafo):
         result += "</graph>\n"
         result += "</gexf>\n"
 
-        open("output/graphMI.gexf", "w").write(result)
+        with open("output/graphMI.gexf", "w") as file:
+            file.write(result)
 
     def __writeGraph(self):
         result = '<attributes class="node">\n'

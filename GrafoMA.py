@@ -19,7 +19,7 @@ class GrafoMA:
         DIRECTED: bool = True,
         num_nodes: int = 0,
         nodes: List[Tuple[str, float]] = [],
-        random_graph_generation: bool = False
+        random_graph_generation: bool = False,
     ):
         self.matrix_adjacency: List[List[List[Edge]]] = self._create_matrix(num_nodes)
         self.nodes_map: Dict[str, Node] = {}
@@ -241,7 +241,7 @@ class GrafoMA:
         v2_index = self.nodes_map[v2].index
 
         return self.matrix_adjacency[v1_index][v2_index] != []
-    
+
     def thers_only_one_edge_btwn_nodes(self, predecessor: str, successor: str):
         v1 = str(predecessor)
         v2 = str(successor)
@@ -249,7 +249,7 @@ class GrafoMA:
         v1_index = self.nodes_map[v1].index
         v2_index = self.nodes_map[v2].index
 
-        return len(self.matrix_adjacency[v1_index][v2_index]) == 1  
+        return len(self.matrix_adjacency[v1_index][v2_index]) == 1
 
     def get_edge_count(self):
         return len(self.edges_map)
@@ -265,9 +265,11 @@ class GrafoMA:
             for v2_name in self.nodes_map.keys():
                 if v1_name == v2_name and self.thers_edge_by_nodes(v1_name, v2_name):
                     return False
-                if v1_name != v2_name and not self.thers_only_one_edge_btwn_nodes(v1_name, v2_name):
+                if v1_name != v2_name and not self.thers_only_one_edge_btwn_nodes(
+                    v1_name, v2_name
+                ):
                     return False
-                
+
         return True
 
     def is_simple(self):
@@ -292,12 +294,18 @@ class GrafoMA:
             index = index // 26 - 1
         return resultado
 
-    def _fill_nodes_map(self, num_nodes: int, nodes: List[Tuple[str, float]], random_graph_generation:bool = False):
+    def _fill_nodes_map(
+        self,
+        num_nodes: int,
+        nodes: List[Tuple[str, float]],
+        random_graph_generation: bool = False,
+    ):
         if not nodes:
             for i in range(num_nodes):
                 self.nodes_map[str(i + 1)] = Node(i)
-            if random_graph_generation: self._create_random_edges()
-                    
+            if random_graph_generation:
+                self._create_random_edges()
+
         elif num_nodes == 0 or len(nodes) == num_nodes:
             self.matrix_adjacency = self._create_matrix(len(nodes))
             for i in range(len(nodes)):
@@ -355,7 +363,7 @@ class GrafoMA:
         for i in range(size):
             for j in range(size):
                 edges = self.matrix_adjacency[i][j]
-                if edges.__len__() == 0:
+                if len(edges) == 0:
                     continue
                 for edge in edges:
                     new_graph.add_edge(
@@ -498,8 +506,9 @@ class GrafoMA:
         copy_graph = (
             self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
         )
-        copy_graph.remove_edge_by_name(edge_name)
+
         v1, v2, _ = copy_graph.edges_map[edge_name]
+        copy_graph.remove_edge_by_name(edge_name)
 
         is_bridge = not copy_graph.reachable(v1, v2)
 
@@ -713,7 +722,8 @@ class GrafoMA:
         result += "</graph>\n"
         result += "</gexf>\n"
 
-        open("output/graphMA.gexf", "w").write(result)
+        with open("output/graphMA.gexf", "w") as file:
+            file.write(result)
 
     def to_graph(self, path: str):
 
@@ -859,6 +869,6 @@ class GrafoMA:
                 should_add_edge = random.randint(1, 5) == 1
                 v1_index = self.nodes_map[v1_name].index
                 v2_index = self.nodes_map[v2_name].index
-                
+
                 if v1_index < v2_index and should_add_edge:
                     self.add_edge(v1_name, v2_name, 1)
