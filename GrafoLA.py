@@ -87,7 +87,7 @@ class GrafoLA:
         ValueError: If a node with the given name already exists in the graph.
         """
         name = str(name)
-        if name not in self.nodes_map: 
+        if name not in self.nodes_map:
             self.list_adjacency[name] = []
             self.nodes_map[name] = NodeLA(weight, name)
         else:
@@ -323,6 +323,25 @@ class GrafoLA:
                 edges.append(key)
         return edges
 
+    def get_edge_by_nodes(self, predecessor: str, successor: str):
+        """
+        Get the edge between two nodes.
+
+        Args:
+            predecessor (str): The name of the predecessor node.
+            successor (str): The name of the successor node.
+
+        Returns:
+            str: The name of the edge between the two nodes.
+        """
+        predecessor = str(predecessor)
+        successor = str(successor)
+        for key in self.edges_map:
+            v1, v2, _ = self.edges_map[key]
+            if v1 == predecessor and v2 == successor:
+                return key
+        return None
+
     # endregion
     # region Graph Section
     def is_empty(self):
@@ -447,7 +466,7 @@ class GrafoLA:
 
             v1, v2, _ = copy_graph.edges_map[chosen_edge]
             current_node = v2 if v1 == current_node else v1
-            
+
             if last_edge:
                 copy_graph.remove_node(current_node)
             else:
@@ -519,7 +538,6 @@ class GrafoLA:
                 number_of_strongly_connected_components += 1
 
         return number_of_strongly_connected_components
-        
 
     # endregion
     # region Bridge and Articulation Section
@@ -738,21 +756,21 @@ class GrafoLA:
     def _get_dfs_result_structure(self, nodes_group: List[str] = None):
         if nodes_group == None:
             nodes_group = self.nodes_map.keys()
-            
+
         result: Dict[str, DFSNode] = {}
         for node_name in nodes_group:
             result[node_name] = DFSNode(0, 0, None)
         return result
-    
+
     def connectivity_degree(self):
         if not self.is_connected():
             return ConnectivityDegree.DISCONNECTED
-        
+
         if self.kosaraju() == 1:
             return ConnectivityDegree.STRONGLY_CONNECTED
-        
+
         results: Dict[str, Dict[str, DFSNode]] = {}
-        
+
         for v1_name in self.nodes_map.keys():
             for v2_name in self.nodes_map.keys():
                 if v1_name != v2_name:
@@ -760,10 +778,9 @@ class GrafoLA:
                     v2_to_v1 = self.reachable(v2_name, v1_name, results)
                     if not (v1_to_v2 or v2_to_v1):
                         return ConnectivityDegree.WEAKLY_CONNECTED
-                    
+
         return ConnectivityDegree.UNIDIRECTIONAL_CONNECTED
-            
-        
+
     def reachable(self, v1: str, v2: str, results: Dict[str, Dict[str, DFSNode]]):
         v1 = str(v1)
         v2 = str(v2)
@@ -772,9 +789,9 @@ class GrafoLA:
             result = self._get_dfs_result_structure()
             self._dfs(v1, [0], result)
             results[v1] = result
-        
+
         return results[v1][v2].discovery_time != 0
-    
+
     def _tarjan_dfs(
         self,
         node_name: str,
@@ -786,7 +803,7 @@ class GrafoLA:
         result[node_name].disc = time[0]
         result[node_name].low = time[0]
         time[0] += 1
-        
+
         for v in self.list_adjacency[node_name]:
             if not result[v.name].visited:
                 result[v.name].parent = node_name
@@ -801,7 +818,7 @@ class GrafoLA:
             elif v.name != result[node_name].parent:
                 result[node_name].low = min(result[node_name].low, result[v.name].disc)
 
-    def get_bridge_by_tarjan(self):      
+    def get_bridge_by_tarjan(self):
         if not self.is_connected():
             raise ValueError("Graph is not connected")
 
@@ -824,4 +841,5 @@ class GrafoLA:
                 self._tarjan_dfs(node_name, result, bridges, time)
 
         return bridges
+
     # endregion
