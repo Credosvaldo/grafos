@@ -1,4 +1,4 @@
-from multiprocessing import Process
+from multiprocessing import Process, Manager
 from typing import Dict, List, Tuple
 from models.DFSNode import DFSNode
 from models.Edge import Edge
@@ -7,6 +7,7 @@ from models.Node import Node
 from datetime import datetime
 import copy
 import xmltodict
+
 
 
 class GrafoMA:
@@ -361,7 +362,7 @@ class GrafoMA:
         print("Underlying Graph")
         print(str(aux))
 
-    def _depth_first_search(self, graph: "GrafoMA" = None):
+    def _depth_first_search(self):
 
         time = [0]
         result: Dict[str, DFSNode] = {}
@@ -698,12 +699,35 @@ class GrafoMA:
             self.add_edge(source, target, edge["@weight"], edge["@label"])
         return self
 
+    def _paralel_dfs(self, shared_dict):
+        result = self._depth_first_search()
+        shared_dict["dfs"] = result
+    
+    def _paralel_make_revert_graph(self, shared_dict):
+        result = self.make_revert_graph()
+        shared_dict["revert"] = result
+
     def kosaraju(self):
-        p1 = Process(target=self._depth_first_search())
-        p2 = Process(target=self.make_revert_graph())
+        if not self.DIRECTED:
+            raise ValueError("Graph is not directed")
+        
+        dfs = self._depth_first_search()
+        revert = self.make_revert_graph()
+        
+        sorted_keys = sorted(dfs.keys(), key=lambda k: dfs[k].finishing_time)
+        
+        time = [0]
+        result: Dict[str, DFSNode] = {}
 
-        p1.start()
-        p2.start()
+        for key in sorted_keys:
+            result[key] = DFSNode(0, 0, None)
 
-        p1.join()
-        p2.join()
+        for key in sorted_keys:
+            if dfs[key].discovery_time == 0:
+                revert._dfs(key, time, result)
+
+        for dfs_node in result.values():
+            if dfs_node.parent == None:
+                number_of_strongly_connected_components+=1 
+        
+        return number_of_strongly_connected_components
