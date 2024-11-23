@@ -752,6 +752,9 @@ class GrafoMA:
         node_index = self.nodes_map[node_name].index
 
         for v in self.matrix_adjacency[node_index]:
+            if len(v) == 0:
+                continue
+            
             edge = v[0]
             v1, v2, _ = self.edges_map[edge.name]
             neibor = v2 if v1 == node_name else v1
