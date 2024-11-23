@@ -7,7 +7,6 @@ from multiprocessing import Process
 import copy
 
 
-
 class GrafoMI:
 
     def __init__(
@@ -112,9 +111,9 @@ class GrafoMI:
         # Criando a nova aresta
         new_edge = Edge(name=name, weight=weight)
         self.matrix_incidency[v1_index][new_edge_index] = Edge(
-            name=name, weight=-weight if self.DIRECTED else weight
+            name=name, weight=-1 if self.DIRECTED else 1
         )
-        self.matrix_incidency[v2_index][new_edge_index] = Edge(name=name, weight=weight)
+        self.matrix_incidency[v2_index][new_edge_index] = Edge(name=name, weight=1)
 
         # Atualizando o mapeamento de arestas
         self.edges_map[name] = (v1, v2, new_edge_index, weight)
@@ -687,38 +686,40 @@ class GrafoMI:
                 visited.update(reachable_nodes)
 
         return strongly_connected_components
-    
-    def get_articulations(self): # metodo "naive" de verificar se é articulação
-        if self.is_empty(): # se o grafo for vazio não tem como ter articulações
+
+    def get_articulations(self):  # metodo "naive" de verificar se é articulação
+        if self.is_empty():  # se o grafo for vazio não tem como ter articulações
             return []
-        
-        articulations = [] # lista de articulações
+
+        articulations = []  # lista de articulações
         graph_copy = (
             self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
-        ) # copia do grafo para não alterar o original
-        
+        )  # copia do grafo para não alterar o original
+
         # verifica se o grafo já não é deconexo (não tem articulações)
         if not graph_copy._non_directed_connectivity_degree():
             return articulations
-        
-        for node_name in self.nodes_map.keys(): # para cada nó do grafo
-            # salva as arestas que vão ser removidas ao remover o nó 
+
+        for node_name in self.nodes_map.keys():  # para cada nó do grafo
+            # salva as arestas que vão ser removidas ao remover o nó
             edges_names_to_remove = [
-                edge_name for edge_name, edge_info in graph_copy.edges_map.items() if node_name in edge_info[:2]
+                edge_name
+                for edge_name, edge_info in graph_copy.edges_map.items()
+                if node_name in edge_info[:2]
             ]
             edges_to_remove = []
             for edge_name in edges_names_to_remove:
                 v1, v2, weight = graph_copy.edges_map[edge_name]
                 edges_to_remove.append((v1, v2, weight, edge_name))
-            
-            graph_copy.remove_node(node_name) # remove o nó 
-            if not graph_copy._non_directed_connectivity_degree(): # se o grafo deixou de ser conexo
-                articulations.append(node_name) # era articulação
-            graph_copy.add_node(node_name) # retorna o nó para o grafo copia 
-            
+
+            graph_copy.remove_node(node_name)  # remove o nó
+            if (
+                not graph_copy._non_directed_connectivity_degree()
+            ):  # se o grafo deixou de ser conexo
+                articulations.append(node_name)  # era articulação
+            graph_copy.add_node(node_name)  # retorna o nó para o grafo copia
+
             # retorna as arestas removidas
             for v1, v2, weight, edge_name in edges_to_remove:
                 graph_copy.add_edge(v1, v2, weight, edge_name)
         return articulations
-        
-        
