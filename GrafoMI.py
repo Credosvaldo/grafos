@@ -484,24 +484,39 @@ class GrafoMI:
             else:
                 return "Desconexo"
         else:
-            # Cria o grafo subjacente e verifica se ele é conexo
+             # Grafo direcionado: verificamos primeiro a semi-forte conectividade.
             underlying_graph = self.make_underlying_graph()
-            if underlying_graph._non_directed_connectivity_degree():
-                # Verifica semi-forte conectividade (se pelo menos um nó alcança o outro)
-                for node_index in self.nodes_map: # para cada nó do grafo
-                    reachable_from_node = self._get_reachable_nodes(node_index) # verifica os alcançaveis
-                    if len(reachable_from_node) != len(self.nodes_map):
-                        return "Simplesmente conexo"
-                # Verifica forte conectividade (se todos os pares de nós se alcançam mutuamente)
-                for node_index in self.nodes_map:
-                    reachable_from_node = self._get_reachable_nodes(node_index)
-                    for other_index in self.nodes_map:
-                        if other_index not in reachable_from_node:
-                            return "Semi-fortemente Conexo"
-                return "Fortemente Conexo"
-            else:
-                # se o grafo subjacente não for conexo, o grafo original é desconexo
+            if not underlying_graph._non_directed_connectivity_degree():
                 return "Desconexo"
+
+            semifortemente = False
+            # Verifica se é fortemente conexo
+            for node in self.nodes_map:
+                reachable = self._get_reachable_nodes(node)
+                if len(reachable) != len(self.nodes_map):  
+                    # Se o nó não alcança todos os outros temos que ver se os que faltam alcança o nó
+                    # para isso primeiro pegamos um set com os nós que faltam
+                    missing_nodes = set(self.nodes_map.keys()) - reachable
+                    # depois montamos um grafo reverso
+                    revert_graph = self.make_revert_graph()
+                    # depois iteramos sobre os nós que faltam e vemos se eles alcançam o nó
+                    for missing_node in missing_nodes:
+                        nodes_that_reach_the_current_node = revert_graph._get_reachable_nodes(node)
+                        if missing_node not in nodes_that_reach_the_current_node:
+                            # Como já provamos que o grafo é conexo
+                            # Se algum nó não alcança e nem é alcançado por outro
+                            # o grafo é simplesmente conexo
+                            return "Simplesmente conexo" 
+                    # se passamos da verificação de simplesmente conexo
+                    # significa que o nó atual (node) não alcança algum nó, mas esse nó alcança ele
+                    # então o grafo é no máximo semi-fortemente conexo
+                    # não dou um early return aqui pq pode ser que algum nó futuro não alcance nem seja alcançado por algum nó
+                    semifortemente = True
+            
+            if semifortemente:        
+                return "Semi-fortemente Conexo" # se todos os nós são alcançados por todos é semi-fortemente conexo
+            return "Fortemente Conexo" # se todos alcançam todos é fortemente conexo
+
 
     def _get_reachable_nodes(self, start_node_name):
         # Busca em profundidade para pegar todos os nós alcançáveis a partir de um nó inicial
