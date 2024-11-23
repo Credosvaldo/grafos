@@ -433,3 +433,88 @@ class GrafoMI:
         # Chegando no final da busca em profundidade, incrementamos o contador global e atribuimos o TT
         time[0] += 1
         result[node_name].finishing_time = time[0]
+        
+    def _non_directed_connectivity_degree(self):
+        # Inicializa um conjunto para nós visitados
+        visited = set()
+        
+        # Busca em profundidade a partir de um nó inicial para ver se dá pra alcançar td mundo
+        def dfs_for_connectivity(node_index):
+            visited.add(node_index) # adiciona o nó atual nos visitados
+            for edge_index, edge in enumerate(self.matrix_incidency[node_index]):
+                if edge: # se tiver uma aresta conectada no nó sendo analisado
+                    # ver quem que a aresta conecta
+                    # se for loop a gnt pula pra proxima iteração
+                    v1 = self.edges_map[edge.name][0] 
+                    v2 = self.edges_map[edge.name][1]
+                    
+                    v1_index = self.nodes_map[v1].index
+                    v2_index = self.nodes_map[v2].index
+                    
+                    # se a aresta liga v1 com v2
+                    if v1_index == node_index and v2_index != node_index:
+                        # e v1 == nó sendo avaliado, o vizinho é v2
+                        neighbor = v2 
+                    elif v2_index == node_index and v1_index != node_index:
+                        # se v2 == nó sendo avaliado, o vizinho é v1
+                        neighbor = v1
+                    else:
+                        # se for loop siginifica que já adicionamos aos nós visitados quando começou essa iteração
+                        # então podemos passar para a proxima aresta conectada a esse nó
+                        continue
+                    
+                    neighbor_index = self.nodes_map[neighbor].index
+                    if neighbor_index not in visited: 
+                        # se ele ainda não foi visitado fazemos uma busca em profundidade nele
+                        dfs_for_connectivity(neighbor_index) 
+        
+        # Começa a DFS do primeiro nó disponível
+        start_node_index = next(iter(self.nodes_map.values())).index
+        dfs_for_connectivity(start_node_index)
+        
+        # Verifica se todos os nós foram visitados
+        return len(visited) == len(self.nodes_map)
+
+    def connectivity_degree(self):
+        # Verifica se o grafo não é direcionado
+        if not self.DIRECTED:
+            # Se for não direcionado, basta verificar a conectividade
+            if self._non_directed_connectivity_degree():
+                return "Conexo"
+            else:
+                return "Desconexo"
+        else:
+            # Cria o grafo subjacente e verifica se ele é conexo
+            underlying_graph = self.make_underlying_graph()
+            if underlying_graph._non_directed_connectivity_degree():
+                # Verifica semi-forte conectividade (se pelo menos um nó alcança o outro)
+                for node_index in self.nodes_map: # para cada nó do grafo
+                    reachable_from_node = self._get_reachable_nodes(node_index) # verifica os alcançaveis
+                    if len(reachable_from_node) != len(self.nodes_map):
+                        return "Simplesmente conexo"
+                # Verifica forte conectividade (se todos os pares de nós se alcançam mutuamente)
+                for node_index in self.nodes_map:
+                    reachable_from_node = self._get_reachable_nodes(node_index)
+                    for other_index in self.nodes_map:
+                        if other_index not in reachable_from_node:
+                            return "Semi-fortemente Conexo"
+                return "Fortemente Conexo"
+            else:
+                # se o grafo subjacente não for conexo, o grafo original é desconexo
+                return "Desconexo"
+
+    def _get_reachable_nodes(self, start_node_name):
+        # Busca em profundidade para pegar todos os nós alcançáveis a partir de um nó inicial
+        visited = set() # nós alcançados
+        stack = [start_node_name] # Começa o stack com o nó inicial
+        while stack: # enquanto stack não estiver vazio
+            current = stack.pop() # considera o nó atual como o último a ser adicionado ao stack
+            if current not in visited: # se o nó não foi visitado ainda
+                visited.add(current) # adiciona ele aos visitados
+                current_index = self.nodes_map[current].index # pega o index do nó atual
+                for edge_index, edge in enumerate(self.matrix_incidency[current_index]): # para cada coluna na linha do nó atual
+                    if edge and edge.weight < 0: # se tiver uma aresta saindo do nó atual 
+                        neighbor = self.edges_map[edge.name][1] # pega o destino da aresta
+                        if neighbor not in visited: # ve se ele já foi visitado
+                            stack.append(neighbor) # adiciona ao stakck
+        return visited
