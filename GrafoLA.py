@@ -130,10 +130,8 @@ class GrafoLA:
     def get_all_nodes_degree(self):
         nodes_degree: Dict[str, int] = {}
         for node_name in self.nodes_map.keys():
-            nodes_degree[node_name] = 0
-            for edge in self.edges_map.values():
-                if node_name in edge[:2]:
-                    nodes_degree[node_name] += 1
+            nodes_degree[node_name] = len(self.list_adjacency[node_name])
+
         return nodes_degree
 
     # endregion
