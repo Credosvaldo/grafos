@@ -88,8 +88,9 @@ graph.add_node("AS")
 graph.add_edge("F", "AS", name="edge1")
 print(graph.is_bridge("edge1"))
 
-
-
+print(graph)
+print(graph.matrix())
+print(graph.weight_matrix())
 # a = GrafoMA(DIRECTED=True)
 
 # a.add_edge(1, 2, 1)

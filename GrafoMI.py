@@ -1,5 +1,5 @@
 from typing import Dict, List, Tuple
-from Grafo import Grafo
+from IGrafo import IGrafo
 from enums.ConnectivityDegree import ConnectivityDegree
 from models.TarjansNode import TarjansNode
 from models.DFSNode import DFSNode
@@ -10,7 +10,7 @@ from multiprocessing import Process
 import copy
 
 
-class GrafoMI(Grafo):
+class GrafoMI(IGrafo):
 
     def __init__(
         self,
@@ -271,7 +271,7 @@ class GrafoMI(Grafo):
                     if self.matrix_incidency[v2_index][edge_index]:
                         return True
         return False
-    
+
     def thers_only_one_edge_btwn_nodes(self, predecessor: str, successor: str):
         v1 = str(predecessor)
         v2 = str(successor)
@@ -357,9 +357,7 @@ class GrafoMI(Grafo):
                     v1_name, v2_name
                 ):
                     return False
-                if v1_name == v2_name and self.thers_node_adjacency(
-                    v1_name, v2_name
-                ):
+                if v1_name == v2_name and self.thers_node_adjacency(v1_name, v2_name):
                     return False
         return True
 
@@ -452,11 +450,6 @@ class GrafoMI(Grafo):
             new_graph.add_edge(v2, v1, edge_weight, edge_name)
 
         return new_graph
-
-    def print_underlying_graph(self):
-        aux = self.make_underlying_graph()
-        print("Underlying Graph")
-        print(str(aux))
 
     def _non_directed_connectivity_degree(self):
         # Inicializa um conjunto para nós visitados
@@ -823,7 +816,7 @@ class GrafoMI(Grafo):
 
         copy_graph.remove_edge_by_name(edge_name)
         v1, v2, _, _ = copy_graph.edges_map[edge_name]
-        
+
         is_bridge = not copy_graph.reachable(v1, v2)
 
         return is_bridge
@@ -843,8 +836,9 @@ class GrafoMI(Grafo):
 
         euler_path: List[str] = []
         copy_graph = copy.deepcopy(self)
-        is_bridge_method = copy_graph.is_bridge_by_tarjan if by_tarjan else copy_graph.is_bridget
-
+        is_bridge_method = (
+            copy_graph.is_bridge_by_tarjan if by_tarjan else copy_graph.is_bridget
+        )
 
         nodes_degree = copy_graph.get_all_nodes_degree()
         odd_degree_nodes = [
@@ -920,7 +914,7 @@ class GrafoMI(Grafo):
             elif neibor != result[node_name].parent:
                 result[node_name].low = min(result[node_name].low, result[neibor].disc)
 
-    def get_bridge_by_tarjan(self):      
+    def get_bridge_by_tarjan(self):
         if not self.is_connected():
             raise ValueError("Graph is not connected")
 
@@ -943,7 +937,7 @@ class GrafoMI(Grafo):
                 self._tarjan_dfs(node_name, result, bridges, time)
 
         return bridges
-    
+
     def _tarjan_dfs(
         self,
         node_name: str,
@@ -956,8 +950,6 @@ class GrafoMI(Grafo):
         result[node_name].low = time[0]
         time[0] += 1
 
-        node_index = self.nodes_map[node_name].index
-        
         for v in self.get_edges_by_node(node_name):
             v1, v2, _, _ = self.edges_map[v]
             neibor = v2 if v1 == node_name else v1
@@ -975,7 +967,7 @@ class GrafoMI(Grafo):
             elif neibor != result[node_name].parent:
                 result[node_name].low = min(result[node_name].low, result[neibor].disc)
 
-    def get_bridge_by_tarjan(self):      
+    def get_bridge_by_tarjan(self):
         if not self.is_connected():
             raise ValueError("Graph is not connected")
 
@@ -998,12 +990,12 @@ class GrafoMI(Grafo):
                 self._tarjan_dfs(node_name, result, bridges, time)
 
         return bridges
-    
+
     def is_bridge_by_tarjan(self, edge_name: str):
         edge_name = str(edge_name)
         bridges = self.get_bridge_by_tarjan()
         return edge_name in bridges
-    
+
     def reachable(self, v1: str, v2: str, results: Dict[str, Dict[str, DFSNode]] = {}):
         v1 = str(v1)
         v2 = str(v2)
@@ -1014,7 +1006,7 @@ class GrafoMI(Grafo):
             results[v1] = result
 
         return results[v1][v2].discovery_time != 0
-    
+
     def _get_dfs_result_structure(self, nodes_group: List[str] = None):
         if nodes_group == None:
             nodes_group = self.nodes_map.keys()

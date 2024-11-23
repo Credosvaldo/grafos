@@ -1,6 +1,7 @@
 from multiprocessing import Process, Manager
 import random
 from typing import Dict, List, Tuple
+from IGrafo import IGrafo
 from enums.ConnectivityDegree import ConnectivityDegree
 from models.TarjansNode import TarjansNode
 from models.DFSNode import DFSNode
@@ -12,7 +13,7 @@ import copy
 import xmltodict
 
 
-class GrafoMA:
+class GrafoMA(IGrafo):
 
     def __init__(
         self,
@@ -28,8 +29,7 @@ class GrafoMA:
         self.excluded_nodes_index = []
         self._fill_nodes_map(num_nodes, nodes, random_graph_generation)
 
-    def __str__(self) -> str:
-        return self.show_some()
+    def matrix(self):
         result = "   Adjacency Matrix\n\n"
         result += "      "
         for i in range(len(self.nodes_map)):
@@ -50,7 +50,7 @@ class GrafoMA:
             result += row + "\n"
         return result
 
-    def print_weight_matrix(self):
+    def weight_matrix(self):
         result = "   Weight Matrix\n\n"
         result += "      "
         for i in range(len(self.nodes_map)):
@@ -70,9 +70,9 @@ class GrafoMA:
                     for edge in cell:
                         row += f" {edge.weight} "
             result += row + "\n"
-        print(result)
+        return result
 
-    def show_some(self):  # this functions was __str__ before
+    def __str__(self):  # this functions was __str__ before
         string = "[\n  "
         string += "\n  ".join(
             str(row)
@@ -375,10 +375,6 @@ class GrafoMA:
 
         return new_graph
 
-    def print_underlying_graph(self):
-        aux = self.make_underlying_graph()
-        print("Underlying Graph")
-        print(str(aux))
 
     def _depth_first_search(self):
 

@@ -1,5 +1,6 @@
 from multiprocessing import Process
 from typing import Dict, List, Tuple
+from IGrafo import IGrafo
 from models.TarjansNode import TarjansNode
 from models.DFSNode import DFSNode
 from models.ExcludedEdge import ExcludedEdge
@@ -9,7 +10,7 @@ import copy
 import xmltodict
 
 
-class GrafoLA:
+class GrafoLA(IGrafo):
 
     def __init__(
         self,
@@ -75,7 +76,7 @@ class GrafoLA:
             self.add_edge(edge[0], edge[1], edge[2])
 
     # region Node Section
-    def add_node(self, name: str, weight: float = 1.0):
+    def add_node(self, name: str = None, weight: float = 1.0):
         """
         Adds a new node to the graph.
 
@@ -87,6 +88,14 @@ class GrafoLA:
         ValueError: If a node with the given name already exists in the graph.
         """
         name = str(name)
+        new_edge_name = len(self.edges_map) + 1
+
+        while name is None or name in self.nodes_map:
+            name = str(new_edge_name)
+            new_edge_name += 1
+
+        name = str(name)
+
         if name not in self.nodes_map:
             self.list_adjacency[name] = []
             self.nodes_map[name] = NodeLA(weight, name)
@@ -659,10 +668,6 @@ class GrafoLA:
 
         return new_graph
 
-    def print_underlying_graph(self):
-        aux = self.make_underlying_graph()
-        print("Underlying Graph")
-        print(str(aux))
 
     # endregion
     # region xml to graph Section
