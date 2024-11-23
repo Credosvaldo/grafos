@@ -83,3 +83,27 @@ graphMI.to_graph("output/graphMI.gexf")
 print(graphLa)
 print(graphMa)
 print(graphMI)
+
+
+
+
+
+
+
+# a = GrafoMA(DIRECTED=True)
+
+# a.add_edge(1, 2, 1)
+# a.add_edge(2, 5, 1)
+# a.add_edge(5, 3, 1)
+# a.add_edge(3, 1, 1)
+
+# a.add_edge(1, 4, 1)
+# a.add_edge(4, 6, 1)
+# a.add_edge(3, 6, 1)
+
+# a.add_edge(5, 7, 1)
+# a.add_edge(6, 7, 1)
+# a.add_edge(7, 6, 1)
+
+# print(a)
+# print(a.kosaraju())
