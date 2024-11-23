@@ -101,6 +101,5 @@ class TestAllGraphNotDirected(unittest.TestCase):
             self.graphMA.get_bridge_by_tarjan(), self.graphMI.get_bridge_by_tarjan()
         )
 
-
 if __name__ == "__main__":
     unittest.main()
