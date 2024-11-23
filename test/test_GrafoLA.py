@@ -118,7 +118,7 @@ class TestGrafoLA(unittest.TestCase):
         self.graph.add_node("A", 1.0)
         self.graph.add_node("B", 2.0)
         self.graph.add_edge("A", "B", 3.0, "edge1")
-        self.assertEqual(self.graph.get_all_nodes_degree(), {"A": 1, "B": 1})
+        self.assertEqual(self.graph.get_all_nodes_degree(), {"A": 1, "B": 0})
 
     def test_get_euler_path(self):
         self.graph.DIRECTED = False
@@ -127,7 +127,7 @@ class TestGrafoLA(unittest.TestCase):
         self.graph.add_edge("A", "B", 3.0, "edge1")
 
         euler_path = self.graph.get_euler_path()
-        self.assertEqual(euler_path, ["A"])
+        self.assertEqual(euler_path, ["A", "B"])
 
     def test_is_bridget(self):
         self.graph.add_node("A", 1.0)
@@ -152,6 +152,14 @@ class TestGrafoLA(unittest.TestCase):
         self.assertIn("A", underlying_graph.nodes_map)
         self.assertIn("B", underlying_graph.nodes_map)
         self.assertIn("edge1", underlying_graph.edges_map)
+
+    def test_get_bridges(self):
+        self.graph.add_node("A", 1.0)
+        self.graph.add_node("B", 2.0)
+        self.graph.add_node("C", 3.0)
+        self.graph.add_edge("A", "B", 3.0, "edge1")
+        self.graph.add_edge("B", "C", 3.0, "edge2")
+        self.assertEqual(self.graph.get_bridge(), ["edge1", "edge2"])
 
 
 if __name__ == "__main__":
