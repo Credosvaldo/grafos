@@ -65,19 +65,19 @@ class TestAllGraphNotDirected(unittest.TestCase):
         self.assertFalse(self.graphMA.is_simple())
         self.assertFalse(self.graphMI.is_simple())
 
-    # def test_get_euler_path(self):
-    #     self.graphLA.add_node(1, 7)
-    #     self.graphMA.add_node(1, 7)
-    #     self.graphMI.add_node(1, 7)
-    #     self.graphLA.add_node(2, 7)
-    #     self.graphMA.add_node(2, 7)
-    #     self.graphMI.add_node(2, 7)
-    #     self.graphLA.add_edge(1, 2, 7)
-    #     self.graphMA.add_edge(1, 2, 7)
-    #     self.graphMI.add_edge(1, 2, 7)
-    #     self.assertEqual(self.graphLA.get_euler_path(), self.graphMA.get_euler_path())
-    #     self.assertEqual(self.graphMA.get_euler_path(), self.graphMI.get_euler_path())
-
+    def test_get_euler_path(self):
+        self.graphLA.add_node(1, 7)
+        self.graphMA.add_node(1, 7)
+        self.graphMI.add_node(1, 7)
+        self.graphLA.add_node(2, 7)
+        self.graphMA.add_node(2, 7)
+        self.graphMI.add_node(2, 7)
+        self.graphLA.add_edge(1, 2, 7)
+        self.graphMA.add_edge(1, 2, 7)
+        self.graphMI.add_edge(1, 2, 7)
+        self.assertEqual(self.graphLA.get_euler_path(), self.graphMA.get_euler_path())
+        # self.assertEqual(self.graphMA.get_euler_path(), self.graphMI.get_euler_path())
+    
 
 if __name__ == "__main__":
     unittest.main()

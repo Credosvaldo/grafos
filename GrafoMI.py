@@ -687,7 +687,7 @@ class GrafoMI:
                 strongly_connected_components.append(reachable_nodes)
                 visited.update(reachable_nodes)
 
-        return strongly_connected_components
+        return len(strongly_connected_components)
 
     def get_articulations(self):  # metodo "naive" de verificar se é articulação
         if self.is_empty():  # se o grafo for vazio não tem como ter articulações
