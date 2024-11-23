@@ -246,7 +246,7 @@ class GrafoMI:
                 self.edges_map[edge_name][3],
             )
 
-    def thers_node_adjacente(self, predecessor: str, sucessor: str):
+    def thers_node_adjacency(self, predecessor: str, sucessor: str):
         v1 = str(predecessor)
         v2 = str(sucessor)
 
@@ -270,6 +270,31 @@ class GrafoMI:
                     if self.matrix_incidency[v2_index][edge_index]:
                         return True
         return False
+    
+    def thers_only_one_edge_btwn_nodes(self, predecessor: str, sucessor: str):
+        v1 = str(predecessor)
+        v2 = str(sucessor)
+
+        if v1 not in self.nodes_map or v2 not in self.nodes_map:
+            raise ValueError("Node does not exist")
+
+        v1_index = self.nodes_map[v1].index
+        v2_index = self.nodes_map[v2].index
+
+        # Para cada coluna (ou seja, para cada aresta)
+        count = 0
+        for edge_index, edge in enumerate(self.matrix_incidency[v1_index]):
+            # se existe uma aresta (ou seja, a matrix[linha][coluna] != None)
+            if edge:
+                # se o grafo for direcionado só é adjacente se sair de v1 e ir pra v2
+                if self.DIRECTED:
+                    if edge.weight < 0 and self.matrix_incidency[v2_index][edge_index]:
+                        count += 1
+                else:
+                    # se for não direcionado, basta que a aresta ligue os dois nós
+                    if self.matrix_incidency[v2_index][edge_index]:
+                        count += 1
+        return count == 1
 
     def theres_edge_adjacente(self, edge1: str, edge2: str):
         if edge1 not in self.edges_map or edge2 not in self.edges_map:
@@ -325,10 +350,14 @@ class GrafoMI:
 
     def is_complete(self):
         # um grafo é completo se todos os nós forem diretamente adjacentes a todos os outros nós
-        for node1_name, node1 in self.nodes_map.items():
-            for node2_name, node2 in self.nodes_map.items():
-                if node1_name != node2_name and not self.thers_node_adjacente(
-                    node1_name, node2_name
+        for v1_name in self.nodes_map.keys():
+            for v2_name in self.nodes_map.keys():
+                if v1_name != v2_name and not self.thers_only_one_edge_btwn_nodes(
+                    v1_name, v2_name
+                ):
+                    return False
+                if v1_name == v2_name and self.thers_node_adjacency(
+                    v1_name, v2_name
                 ):
                     return False
         return True

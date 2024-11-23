@@ -430,7 +430,7 @@ class GrafoMA:
 
         return ConnectivityDegree.UNIDIRECTIONAL_CONNECTED
 
-    def reachable(self, v1: str, v2: str, results: Dict[str, Dict[str, DFSNode]]):
+    def reachable(self, v1: str, v2: str, results: Dict[str, Dict[str, DFSNode]] = {}):
         v1 = str(v1)
         v2 = str(v2)
 
@@ -504,8 +504,9 @@ class GrafoMA:
             self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
         )
         copy_graph.remove_edge_by_name(edge_name)
+        v1, v2, _ = copy_graph.edges_map[edge_name]
 
-        is_bridge = not copy_graph.is_connected()
+        is_bridge = not copy_graph.reachable(v1, v2, {})
 
         return is_bridge
 
