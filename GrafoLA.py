@@ -1,5 +1,6 @@
 from multiprocessing import Process
 from typing import Dict, List, Tuple
+from models.TarjansNode import TarjansNode
 from models.DFSNode import DFSNode
 from models.ExcludedEdge import ExcludedEdge
 from models.NodeLA import NodeLA
@@ -773,4 +774,54 @@ class GrafoLA:
             results[v1] = result
         
         return results[v1][v2].discovery_time != 0
+    
+    def _tarjan_dfs(
+        self,
+        node_name: str,
+        result: Dict[str, TarjansNode],
+        bridges: List[str],
+        time: List[int],
+    ):
+        result[node_name].visited = True
+        result[node_name].disc = time[0]
+        result[node_name].low = time[0]
+        time[0] += 1
+        
+        for v in self.list_adjacency[node_name]:
+            if not result[v.name].visited:
+                result[v.name].parent = node_name
+
+                self._tarjan_dfs(v.name, result, bridges, time)
+
+                result[node_name].low = min(result[node_name].low, result[v.name].low)
+
+                if result[v.name].low > result[node_name].disc:
+                    bridges.append(self.get_edge_by_nodes(node_name, v.name))
+
+            elif v.name != result[node_name].parent:
+                result[node_name].low = min(result[node_name].low, result[v.name].disc)
+
+    def get_bridge_by_tarjan(self):      
+        if not self.is_connected():
+            raise ValueError("Graph is not connected")
+
+        if self.is_empty():
+            return []
+
+        time = [0]
+        bridges: List[str] = []
+        copy_graph = (
+            self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
+        )
+
+        result: Dict[str, TarjansNode] = {}
+
+        for node_name in self.nodes_map.keys():
+            result[node_name] = TarjansNode(False, None, 0, 0)
+
+        for node_name in copy_graph.nodes_map.keys():
+            if not result[node_name].visited:
+                self._tarjan_dfs(node_name, result, bridges, time)
+
+        return bridges
     # endregion
