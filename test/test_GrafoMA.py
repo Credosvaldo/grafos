@@ -136,7 +136,7 @@ class TestGrafoMA(unittest.TestCase):
         self.graph.add_node("C")
         self.graph.add_edge("F", "AS")
         self.graph.add_edge("AS", "C")
-        self.graph.add_edge("C", "A")
+        self.graph.add_edge("C", "F")
         self.assertEqual(self.graph.get_euler_path(), ["F", "AS", "C"])
 
 
