@@ -1,4 +1,5 @@
 from typing import Dict, List, Tuple
+from enums.ConnectivityDegree import ConnectivityDegree
 from models.DFSNode import DFSNode
 from models.Edge import Edge
 from models.Node import Node
@@ -476,14 +477,14 @@ class GrafoMI:
         if not self.DIRECTED:
             # Se for não direcionado, basta verificar a conectividade
             if self._non_directed_connectivity_degree():
-                return "Conexo"
+                return ConnectivityDegree.STRONGLY_CONNECTED
             else:
-                return "Desconexo"
+                return ConnectivityDegree.DISCONNECTED
         else:
             # Grafo direcionado: verificamos primeiro a semi-forte conectividade.
             underlying_graph = self.make_underlying_graph()
             if not underlying_graph._non_directed_connectivity_degree():
-                return "Desconexo"
+                return ConnectivityDegree.DISCONNECTED
 
             semifortemente = False
             # Verifica se é fortemente conexo
@@ -504,7 +505,7 @@ class GrafoMI:
                             # Como já provamos que o grafo é conexo
                             # Se algum nó não alcança e nem é alcançado por outro
                             # o grafo é simplesmente conexo
-                            return "Simplesmente conexo"
+                            return ConnectivityDegree.WEAKLY_CONNECTED
                     # se passamos da verificação de simplesmente conexo
                     # significa que o nó atual (node) não alcança algum nó, mas esse nó alcança ele
                     # então o grafo é no máximo semi-fortemente conexo
@@ -512,8 +513,12 @@ class GrafoMI:
                     semifortemente = True
 
             if semifortemente:
-                return "Semi-fortemente Conexo"  # se todos os nós são alcançados por todos é semi-fortemente conexo
-            return "Fortemente Conexo"  # se todos alcançam todos é fortemente conexo
+                return (
+                    ConnectivityDegree.UNIDIRECTIONAL_CONNECTED
+                )  # se todos os nós são alcançados por todos é semi-fortemente conexo
+            return (
+                ConnectivityDegree.STRONGLY_CONNECTED
+            )  # se todos alcançam todos é fortemente conexo
 
     def _depth_first_search(self):
         # inicializa o tempo zerado

@@ -7,43 +7,18 @@
 <nodes>
 <node id="A" label="A">
 <attvalues>
-<attvalue for="0" value="1.0"/>
+<attvalue for="0" value="1"/>
 </attvalues>
 </node>
 <node id="B" label="B">
 <attvalues>
-<attvalue for="0" value="2.0"/>
-</attvalues>
-</node>
-<node id="C" label="C">
-<attvalues>
-<attvalue for="0" value="3.0"/>
-</attvalues>
-</node>
-<node id="D" label="D">
-<attvalues>
-<attvalue for="0" value="4.0"/>
-</attvalues>
-</node>
-<node id="E" label="E">
-<attvalues>
-<attvalue for="0" value="5.0"/>
-</attvalues>
-</node>
-<node id="F" label="F">
-<attvalues>
-<attvalue for="0" value="6.0"/>
+<attvalue for="0" value="1"/>
 </attvalues>
 </node>
 </nodes>
 <edges>
-<edge label='edge1' source='A' target='B' weight='1.0'/>
-<edge label='edge2' source='A' target='C' weight='2.0'/>
-<edge label='edge3' source='B' target='D' weight='3.0'/>
-<edge label='edge4' source='B' target='E' weight='4.0'/>
-<edge label='edge5' source='C' target='F' weight='5.0'/>
-<edge label='edge6' source='D' target='F' weight='6.0'/>
-<edge label='edge7' source='E' target='F' weight='7.0'/>
+<edge label='e1' source='A' target='B' weight='1'/>
+<edge label='e2' source='B' target='A' weight='1'/>
 </edges>
 </graph>
 </gexf>
