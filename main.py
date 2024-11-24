@@ -4,11 +4,12 @@ from GrafoLA import GrafoLA
 from GrafoMI import GrafoMI
 
 
-a = GrafoMA(DIRECTED=False, num_nodes=10, random_graph_generation=True)
-
+a = GrafoMA(DIRECTED=False, num_nodes=100000, random_graph_generation=True)
 print(a)
 print(a.edges_map)
 print(len(a.edges_map))
+print(a.is_connected())
+exit()
 
 d = GrafoLA(DIRECTED=False)
 d.add_edge(1, 2, 7)

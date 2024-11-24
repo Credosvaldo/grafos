@@ -862,3 +862,7 @@ class GrafoMA:
                 
                 if v1_index < v2_index and should_add_edge:
                     self.add_edge(v1_name, v2_name, 1)
+                    
+                if v2_index == (len(self.matrix_adjacency) - 1):
+                    if self.get_edges_by_node(v1_name) == []:
+                        self.add_edge(v1_name, random.randint(1, v2_index+1), 1)
