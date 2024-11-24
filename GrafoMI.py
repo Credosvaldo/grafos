@@ -113,10 +113,13 @@ class GrafoMI(IGrafo):
 
         # Criando a nova aresta
         new_edge = Edge(name=name, weight=weight)
-        self.matrix_incidency[v1_index][new_edge_index] = Edge(
-            name=name, weight=-1 if self.DIRECTED else 1
-        )
-        self.matrix_incidency[v2_index][new_edge_index] = Edge(name=name, weight=1)
+        if v1_index != v2_index:
+            self.matrix_incidency[v1_index][new_edge_index] = Edge(
+                name=name, weight=-1 if self.DIRECTED else 1
+            )
+            self.matrix_incidency[v2_index][new_edge_index] = Edge(name=name, weight=1)
+        else:
+            self.matrix_incidency[v1_index][new_edge_index] = Edge(name=name, weight=2)
 
         # Atualizando o mapeamento de arestas
         self.edges_map[name] = (v1, v2, new_edge_index, weight)
@@ -262,6 +265,12 @@ class GrafoMI(IGrafo):
         for edge_index, edge in enumerate(self.matrix_incidency[v1_index]):
             # se existe uma aresta (ou seja, a matrix[linha][coluna] != None)
             if edge:
+                if predecessor == successor:
+                    if edge.weight == 2:
+                        return True
+                    else:
+                        return False
+                    
                 # se o grafo for direcionado só é adjacente se sair de v1 e ir pra v2
                 if self.DIRECTED:
                     if edge.weight < 0 and self.matrix_incidency[v2_index][edge_index]:
@@ -419,11 +428,14 @@ class GrafoMI(IGrafo):
         # adiciona as arestas trocando successor por predecessor
         for edge_name, edge_info in self.edges_map.items():
             v1, v2, edge_index, _ = edge_info
-            # troca o sinal do peso da aresta pq como é direcionado o peso da aresta saindo de v1 tá negativo
-            edge_weight = (
-                self.matrix_incidency[self.nodes_map[v1].index][edge_index].weight * -1
-            )
-            new_graph.add_edge(v2, v1, edge_weight, edge_name)
+            if v1 != v2:
+                # troca o sinal do peso da aresta pq como é direcionado o peso da aresta saindo de v1 tá negativo
+                edge_weight = (
+                    self.matrix_incidency[self.nodes_map[v1].index][edge_index].weight * -1
+                )
+                new_graph.add_edge(v2, v1, edge_weight, edge_name)
+            else:
+                new_graph.add_edge(v1, v2, 2, edge_name)
 
         return new_graph
 
@@ -443,11 +455,14 @@ class GrafoMI(IGrafo):
         # adiciona as arestas ao grafo subjacente
         for edge_name, edge_info in self.edges_map.items():
             v1, v2, edge_index, _ = edge_info
-            # troca o sinal do peso da aresta pq como é direcionado o peso da aresta saindo de v1 tá negativo
-            edge_weight = (
-                self.matrix_incidency[self.nodes_map[v1].index][edge_index].weight * -1
-            )
-            new_graph.add_edge(v2, v1, edge_weight, edge_name)
+            if v1 != v2:
+                # troca o sinal do peso da aresta pq como é direcionado o peso da aresta saindo de v1 tá negativo
+                edge_weight = (
+                    self.matrix_incidency[self.nodes_map[v1].index][edge_index].weight * -1
+                )
+                new_graph.add_edge(v2, v1, edge_weight, edge_name)
+            else:
+                new_graph.add_edge(v2, v1, edge_weight, edge_name)
 
         return new_graph
 
