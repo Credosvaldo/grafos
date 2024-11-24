@@ -112,21 +112,53 @@ exit()
 # print(a)
 # print(a.kosaraju())
 
-# graphLA = GrafoLA()
-# graphLA.to_graph("output/eulerian_graph.gexf")
+graphLA = GrafoLA()
+graphLA.to_graph("output/eulerian_graph_10000.gexf")
 
-# print("GrafoMA Gerado")
-# print(graphLA)
-# print(graphLA.is_simple())
-# print(graphLA.is_connected())
-# startTime = datetime.now()
-# print(graphLA.get_euler_path())
-# endTime = datetime.now()
-# elapsedTime = endTime - startTime
-# print(f"Elapsed time: {elapsedTime} seconds")
 
-# startTime = datetime.now()
-# print(graphLA.get_euler_path(by_tarjan=False))
-# endTime = datetime.now()
-# elapsedTime = endTime - startTime
-# print(f"Elapsed time: {elapsedTime} seconds")
+print("GrafoMA Gerado with 10000 nodes")
+startTime = datetime.now()
+graphLA.get_euler_path()
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with Tarjan")
+
+startTime = datetime.now()
+graphLA.get_euler_path(by_tarjan=False)
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with out Tarjan")
+
+graphLA = GrafoLA()
+graphLA.to_graph("output/eulerian_graph_1000.gexf")
+
+
+print("GrafoMA Gerado with 1000 nodes")
+startTime = datetime.now()
+graphLA.get_euler_path()
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with Tarjan")
+
+startTime = datetime.now()
+graphLA.get_euler_path(by_tarjan=False)
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with out Tarjan")
+
+graphLA = GrafoLA()
+graphLA.to_graph("output/eulerian_graph.gexf")
+
+
+print("GrafoMA Gerado with 100 nodes")
+startTime = datetime.now()
+graphLA.get_euler_path()
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with Tarjan")
+
+startTime = datetime.now()
+graphLA.get_euler_path(by_tarjan=False)
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with out Tarjan")
