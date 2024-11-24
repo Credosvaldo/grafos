@@ -62,6 +62,8 @@ class GrafoLA(IGrafo):
                 "Number of nodes does not match the number of nodes provided"
             )
 
+        num_nodes = num_nodes - 1
+
         for i in range(num_nodes):
 
             name = None if nodes == [] else nodes[i][0]
@@ -77,7 +79,7 @@ class GrafoLA(IGrafo):
 
         for edge in edges:
             self.add_edge(edge[0], edge[1], edge[2])
-            
+
         if random_graph_generation:
             self._create_random_edges()
 
@@ -674,7 +676,6 @@ class GrafoLA(IGrafo):
 
         return new_graph
 
-
     # endregion
     # region xml to graph Section
     def to_graph(self, path: str):
@@ -848,16 +849,16 @@ class GrafoLA(IGrafo):
         bridges = self.get_bridge_by_tarjan()
         return edge_name in bridges
 
-
     def _create_random_edges(self):
         for i in range(len(self.list_adjacency)):
             self.add_edge(i + 1, i + 2)
-            
+
         for v1_name in self.nodes_map.keys():
-            print('criando para: ', v1_name)
+            print("criando para: ", v1_name)
             for v2_name in self.nodes_map.keys():
                 should_add_edge = random.randint(1, 25) == 1
                 if should_add_edge and v1_name != v2_name:
                     if not self.thers_node_adjacency(v1_name, v2_name):
                         self.add_edge(v1_name, v2_name)
+
     # endregion
