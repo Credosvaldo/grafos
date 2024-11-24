@@ -5,173 +5,180 @@ from GrafoMI import GrafoMI
 import sys
 from datetime import datetime
 
-sys.setrecursionlimit(1500000000)
+sys.setrecursionlimit(922337203)
 
+# Lista de adjacencia
 
-# a = GrafoLA(DIRECTED=False, num_nodes=10000, random_graph_generation=True)
-# print(a)
-# print(a.get_euler_path(by_tarjan=True))
-# exit()
-
-# d = GrafoLA(DIRECTED=False)
-# d.add_edge(1, 2, 7)
-# d.add_edge(3, 2, 8)
-# d.add_edge(3, 1, 9)
-
-# b = GrafoMI(DIRECTED=True)
-# b.add_node("A", 1.0)
-# b.add_node("B", 1.0)
-# b.add_node("C", 1.0)
-# b.add_edge("A", "B", 1.0)
-# b.add_edge("A", "C", 1.0)
-# b.add_edge("B", "C", 1.0)
-# print(b.is_simple())
-# b.add_edge("A", "A", 1.0, "edge1")
-# print(b.is_simple())
-# b.remove_edge_by_name("edge1")
-# b.add_edge("B", "A", 1.0, "edge1")
-# print(b.is_simple())
-
-# e = GrafoLA().to_graph("output/graphLA.gexf")
-# f = GrafoMA().to_graph("output/graphMA.gexf")
-
-# print(a)
-# print(f)
-# print(b)
-# print(d)
-# print(e)
-
-
-# euler_a = a.get_euler_path()
-# euler_d = d.get_euler_path()
-
-# print(euler_a)
-# print(euler_d)
-
-# graph = GrafoLA()
-# graph.DIRECTED = True
-# graph.add_node("A", 1.0)
-# graph.add_node("B", 2.0)
-# graph.add_edge("A", "B", 3.0, "edge1")
-# graph.add_edge("B", "AC", 3.0, "edge2")
-# graph.add_edge("A", "B", 3.0, "edge3")
-
-# print(graph)
-# graph.print_revert_graph()
-
-
-# graphMI = GrafoMI()
-# graphMI.to_graph("output/graphMI.gexf")
-# graphMa = GrafoMA()
-# graphMa.to_graph("output/graphMI.gexf")
-
-# graphLA = GrafoLA()
-# graphLA.to_graph("output/graphMI.gexf")
-
-
-# print(graphMI)
-# print(graphMa)
-# print(graphMI)
-
-# TARJAN
-# a = GrafoMA(DIRECTED=False)
-# a.add_edge(1, 2, 7)
-# a.add_edge(2, 3, 7)
-# a.add_edge(2, 5, 7)
-# a.add_edge(3, 4, 7)
-# a.add_edge(3, 6, 7)
-# a.add_edge(7, 4, 7)
-# a.add_edge(7, 6, 7)
-# a.add_edge(4, 6, 7)
-# print(a)
-# # print(a.get_bridge_by_tarjan())
-# graph = GrafoMA()
-# graph.add_node("F")
-# graph.add_node("AS")
-# graph.add_edge("F", "AS", name="edge1")
-# print(graph.is_bridge("edge1"))
-
-# print(graph)
-# print(graph.matrix())
-# print(graph.weight_matrix())
-# a = GrafoMA(DIRECTED=True)
-
-# a.add_edge(1, 2, 1)
-# a.add_edge(2, 5, 1)
-# a.add_edge(5, 3, 1)
-# a.add_edge(3, 1, 1)
-
-# a.add_edge(1, 4, 1)
-# a.add_edge(4, 6, 1)
-# a.add_edge(3, 6, 1)
-
-# a.add_edge(5, 7, 1)
-# a.add_edge(6, 7, 1)
-# a.add_edge(7, 6, 1)
-
-# print(a)
-# print(a.kosaraju())
-
-graphLA = GrafoLA()
-graphLA.to_graph("output/eulerian_graph_10000.gexf")
-
-
-print("GrafoMA Gerado with 10000 nodes")
-startTime = datetime.now()
-graphLA.get_euler_path()
-endTime = datetime.now()
-elapsedTime = endTime - startTime
-print(f"Elapsed time: {elapsedTime} seconds with Tarjan")
-
-startTime = datetime.now()
-graphLA.get_euler_path(by_tarjan=False)
-endTime = datetime.now()
-elapsedTime = endTime - startTime
-print(f"Elapsed time: {elapsedTime} seconds with out Tarjan")
-
-# graphLA = GrafoLA()
-# graphLA.to_graph("output/eulerian_graph_1000.gexf")
-
-
-# print("GrafoMA Gerado with 1000 nodes")
+# graphLA_with_100_nodes = GrafoLA(DIRECTED=False)
+# graphLA_with_100_nodes.to_graph("output/eulerian_graph.gexf")
+# print("GraphLA Gerado with 100 nodes")
 # startTime = datetime.now()
-# graphLA.get_euler_path()
+# graphLA_with_100_nodes.get_euler_path()
 # endTime = datetime.now()
 # elapsedTime = endTime - startTime
-# print(f"Elapsed time: {elapsedTime} seconds with Tarjan")
-
+# print(f"Elapsed time: {elapsedTime} seconds with Tarjan and 100 nodes")
 # startTime = datetime.now()
-# graphLA.get_euler_path(by_tarjan=False)
+# graphLA_with_100_nodes.get_euler_path(by_tarjan=False)
 # endTime = datetime.now()
 # elapsedTime = endTime - startTime
-# print(f"Elapsed time: {elapsedTime} seconds with out Tarjan")
+# print(f"Elapsed time: {elapsedTime} seconds with out Tarjan and 100 nodes")
 
-# graphLA = GrafoLA()
-# graphLA.to_graph("output/eulerian_graph.gexf")
-
-
-# print("GrafoMA Gerado with 100 nodes")
+# graphLA_with_1000_nodes = GrafoLA(DIRECTED=False)
+# graphLA_with_1000_nodes.to_graph("output/eulerian_graph_1000.gexf")
+# print("GraphLA Gerado with 1000 nodes de forma automatica")
 # startTime = datetime.now()
-# graphLA.get_euler_path()
+# graphLA_with_1000_nodes.get_euler_path()
 # endTime = datetime.now()
 # elapsedTime = endTime - startTime
-# print(f"Elapsed time: {elapsedTime} seconds with Tarjan")
-
+# print(f"Elapsed time: {elapsedTime} seconds with Tarjan and 1000 nodes")
 # startTime = datetime.now()
-# graphLA.get_euler_path(by_tarjan=False)
+# graphLA_with_1000_nodes.get_euler_path(by_tarjan=False)
 # endTime = datetime.now()
 # elapsedTime = endTime - startTime
-# print(f"Elapsed time: {elapsedTime} seconds with out Tarjan")
+# print(f"Elapsed time: {elapsedTime} seconds with out Tarjan and 1000 nodes")
 
-graphLA = GrafoLA(DIRECTED=False, num_nodes=10000, random_graph_generation=True)
-print("GrafoMA Gerado with 1000 nodes de forma automatica")
+
+# graphLA_with_10000_nodes = GrafoLA(DIRECTED=False)
+# graphLA_with_10000_nodes.to_graph("output/eulerian_graph_10000.gexf")
+# print("GraphLA Gerado with 10000 nodes de forma automatica")
+# startTime = datetime.now()
+# graphLA_with_10000_nodes.get_euler_path()
+# endTime = datetime.now()
+# elapsedTime = endTime - startTime
+# print(f"Elapsed time: {elapsedTime} seconds with Tarjan and 10000 nodes")
+# startTime = datetime.now()
+# graphLA_with_10000_nodes.get_euler_path(by_tarjan=False)
+# endTime = datetime.now()
+# elapsedTime = endTime - startTime
+# print(f"Elapsed time: {elapsedTime} seconds with out Tarjan and 10000 nodes")
+
+graphLA_with_100000_nodes = GrafoLA(DIRECTED=False, num_nodes=100000, random_graph_generation=True)
+graphLA_with_100000_nodes.to_xml("output/eulerian_graph_100000.xml")
+print("GraphLA Gerado with 100000 nodes de forma automatica")
 startTime = datetime.now()
-graphLA.get_euler_path()
+graphLA_with_100000_nodes.get_euler_path()
 endTime = datetime.now()
 elapsedTime = endTime - startTime
-print(f"Elapsed time: {elapsedTime} seconds with Tarjan")
+print(f"Elapsed time: {elapsedTime} seconds with Tarjan and 100000 nodes")
 startTime = datetime.now()
-graphLA.get_euler_path(by_tarjan=False)
+graphLA_with_100000_nodes.get_euler_path(by_tarjan=False)
 endTime = datetime.now()
 elapsedTime = endTime - startTime
-print(f"Elapsed time: {elapsedTime} seconds with out Tarjan")
+print(f"Elapsed time: {elapsedTime} seconds with out Tarjan and 100000 nodes")
+
+
+# Matrix de adjacencia
+graphMA_with_100_nodes = GrafoMA(DIRECTED=False)
+graphMA_with_100_nodes.to_graph("output/eulerian_graph.gexf")
+print("GraphMA Gerado with 100 nodes")
+startTime = datetime.now()
+graphMA_with_100_nodes.get_euler_path()
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with Tarjan and 100 nodes")
+startTime = datetime.now()
+graphMA_with_100_nodes.get_euler_path(by_tarjan=False)
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with out Tarjan and 100 nodes")
+
+graphMA_with_1000_nodes = GrafoMA(DIRECTED=False)
+graphMA_with_1000_nodes.to_graph("output/eulerian_graph_1000.gexf")
+print("GraphMA Gerado with 1000 nodes de forma automatica")
+startTime = datetime.now()
+graphMA_with_1000_nodes.get_euler_path()
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with Tarjan and 1000 nodes")
+startTime = datetime.now()
+graphMA_with_1000_nodes.get_euler_path(by_tarjan=False)
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with out Tarjan and 1000 nodes")
+
+graphMA_with_10000_nodes = GrafoMA(DIRECTED=False)
+graphMA_with_10000_nodes.to_graph("output/eulerian_graph_10000.gexf")
+print("GraphMA Gerado with 10000 nodes de forma automatica")
+startTime = datetime.now()
+graphMA_with_10000_nodes.get_euler_path()
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with Tarjan and 10000 nodes")
+startTime = datetime.now()
+graphMA_with_10000_nodes.get_euler_path(by_tarjan=False)
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with out Tarjan and 10000 nodes")
+
+graphMA_with_100000_nodes = GrafoMA(DIRECTED=False)
+graphMA_with_100000_nodes.to_graph("output/eulerian_graph_100000.gexf")
+print("GraphMA Gerado with 100000 nodes de forma automatica")
+startTime = datetime.now()
+graphMA_with_100000_nodes.get_euler_path()
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with Tarjan and 100000 nodes")
+startTime = datetime.now()
+graphMA_with_100000_nodes.get_euler_path(by_tarjan=False)
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with out Tarjan and 100000 nodes")
+
+
+## Matrix de Incidencia
+
+graphMI_with_100_nodes = GrafoMI(DIRECTED=False)
+graphMI_with_100_nodes.to_graph("output/eulerian_graph.gexf")
+print("GraphMI Gerado with 100 nodes")
+startTime = datetime.now()
+graphMI_with_100_nodes.get_euler_path()
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with Tarjan and 100 nodes")
+startTime = datetime.now()
+graphMI_with_100_nodes.get_euler_path(by_tarjan=False)
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with out Tarjan and 100 nodes")
+
+graphMI_with_1000_nodes = GrafoMI(DIRECTED=False)
+graphMI_with_1000_nodes.to_graph("output/eulerian_graph_1000.gexf")
+print("GraphMI Gerado with 1000 nodes de forma automatica")
+startTime = datetime.now()
+graphMI_with_1000_nodes.get_euler_path()
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with Tarjan and 1000 nodes")
+startTime = datetime.now()
+graphMI_with_1000_nodes.get_euler_path(by_tarjan=False)
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with out Tarjan and 1000 nodes")
+
+graphMI_with_10000_nodes = GrafoMI(DIRECTED=False)
+graphMI_with_10000_nodes.to_graph("output/eulerian_graph_10000.gexf")
+print("GraphMI Gerado with 10000 nodes de forma automatica")
+startTime = datetime.now()
+graphMI_with_10000_nodes.get_euler_path()
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with Tarjan and 10000 nodes")
+startTime = datetime.now()
+graphMI_with_10000_nodes.get_euler_path(by_tarjan=False)
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with out Tarjan and 10000 nodes")
+
+graphMI_with_100000_nodes = GrafoMI(DIRECTED=False)
+graphMI_with_100000_nodes.to_graph("output/eulerian_graph_100000.gexf")
+print("GraphMI Gerado with 100000 nodes de forma automatica")
+startTime = datetime.now()
+graphMI_with_100000_nodes.get_euler_path()
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with Tarjan and 100000 nodes")
+startTime = datetime.now()
+graphMI_with_100000_nodes.get_euler_path(by_tarjan=False)
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with out Tarjan and 100000 nodes")

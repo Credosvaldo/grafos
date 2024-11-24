@@ -578,11 +578,9 @@ class GrafoMA(IGrafo):
 
     def get_euler_path(self, by_tarjan: bool = True):
         """
-        Get the euler path of the graph.
-        Args:
-            by_tarjan (bool): Use Tarjan algorithm to find the bridge edges.
+        Get the Euler Path of the graph.
         Returns:
-            List[str]: A list with the euler path.
+            List[str]: A list with the nodes name of the Euler Path.
         """
         if self.is_empty():
             return []
@@ -617,25 +615,19 @@ class GrafoMA(IGrafo):
         while copy_graph.get_edge_count() > 0:
             euler_path.append(current_node)
             edges_of_current_node = copy_graph.get_edges_by_node(current_node)
-            last_edge = False
 
             if len(edges_of_current_node) == 1:
                 chosen_edge = edges_of_current_node[0]
-                last_edge = True
             else:
                 for edge_name in edges_of_current_node:
                     if not is_bridge_method(edge_name):
                         chosen_edge = edge_name
-                        last_edge = False
                         break
 
             v1, v2, _ = copy_graph.edges_map[chosen_edge]
             current_node = v2 if v1 == current_node else v1
 
-            if last_edge:
-                copy_graph.remove_node(current_node)
-            else:
-                copy_graph.remove_edge_by_name(chosen_edge)
+            copy_graph.remove_edge_by_name(chosen_edge)
 
         if copy_graph.get_edge_count() != 0:
             raise ValueError("Graph has more than one connected component")

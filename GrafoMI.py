@@ -814,8 +814,8 @@ class GrafoMI(IGrafo):
             self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
         )
 
-        copy_graph.remove_edge_by_name(edge_name)
         v1, v2, _, _ = copy_graph.edges_map[edge_name]
+        copy_graph.remove_edge_by_name(edge_name)
 
         is_bridge = not copy_graph.reachable(v1, v2)
 
@@ -837,7 +837,7 @@ class GrafoMI(IGrafo):
         euler_path: List[str] = []
         copy_graph = copy.deepcopy(self)
         is_bridge_method = (
-            copy_graph.is_bridge_by_tarjan if by_tarjan else copy_graph.is_bridget
+            copy_graph.is_bridge_by_tarjan if by_tarjan else copy_graph.is_bridge
         )
 
         nodes_degree = copy_graph.get_all_nodes_degree()
@@ -990,7 +990,7 @@ class GrafoMI(IGrafo):
                 self._tarjan_dfs(node_name, result, bridges, time)
 
         return bridges
-    
+
     def is_bridge_by_tarjan(self, edge_name: str):
         if self.is_empty():
             return []
@@ -1003,7 +1003,7 @@ class GrafoMI(IGrafo):
         for node_name in self.nodes_map.keys():
             result[node_name] = TarjansNode(False, None, 0, 0)
 
-        v1, _, _ = self.edges_map[edge_name]
+        v1, _, _, _ = self.edges_map[edge_name]
 
         self._tarjan_dfs(v1, result, bridges, time)
 
