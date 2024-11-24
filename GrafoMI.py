@@ -765,6 +765,28 @@ class GrafoMI(IGrafo):
                 graph_copy.add_edge(v1, v2, weight, edge_name)
         return articulations
 
+    def is_articulation(self, node_name: str):
+        """
+        Check if the given node is an articulation.
+        Args:
+            node_name (str): The node name.
+        Returns:
+            bool: True if the node is an articulation, False otherwise.
+        """
+        node_name = str(node_name)
+
+        if node_name not in self.nodes_map:
+            raise ValueError("Node name does not exist")
+
+        copy_graph = (
+            self.make_underlying_graph() if self.DIRECTED else copy.deepcopy(self)
+        )
+        copy_graph.remove_node(node_name)
+
+        is_articulation = not copy_graph.is_connected()
+
+        return is_articulation
+
     def is_connected(self):
         return self._non_directed_connectivity_degree()
 
