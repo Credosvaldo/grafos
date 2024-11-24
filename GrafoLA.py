@@ -851,8 +851,10 @@ class GrafoLA(IGrafo):
 
         for node_name in self.nodes_map.keys():
             result[node_name] = TarjansNode(False, None, 0, 0)
+            
+        v1, v2, _ = self.edges_map[edge_name]
 
-        self._tarjan_dfs(node_name, result, bridges, time)
+        self._tarjan_dfs(v1, result, bridges, time)
 
         return edge_name in bridges
 
