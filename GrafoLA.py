@@ -472,8 +472,8 @@ class GrafoLA(IGrafo):
                         last_edge = False
                         break
 
-            v1, v2, _ = copy_graph.edges_map[chosen_edge]
             current_node = v2 if v1 == current_node else v1
+            v1, v2, _ = copy_graph.edges_map[chosen_edge]
 
             if last_edge:
                 copy_graph.remove_node(current_node)
