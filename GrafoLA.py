@@ -371,7 +371,7 @@ class GrafoLA(IGrafo):
         return True
 
     def is_simple(self):
-        for node_key in self.list_adjacency:
+        for node_key in self.list_adjacency.keys():
             aux = self.list_adjacency[node_key]
 
             if aux.count(self.nodes_map[node_key]) > 0:
