@@ -88,16 +88,18 @@ class TestGrafoMA(unittest.TestCase):
         self.assertEqual(new_graph.get_edge_count(), 0)
 
     def test_is_empty(self):
+        self.graph = GrafoMA(DIRECTED=False)
         self.assertTrue(self.graph.is_empty())
         self.graph.add_node("F")
         self.assertFalse(self.graph.is_empty())
 
     def test_is_complete(self):
+        self.graph = GrafoMA()
         self.graph.add_node("F")
         self.graph.add_node("AS")
         self.graph.add_edge("F", "AS")
         self.assertFalse(self.graph.is_complete())
-        self.graph.add_edge("AS", "A")
+        self.graph.add_edge("AS", "F")
         self.assertTrue(self.graph.is_complete())
 
     def test_is_simple(self):
@@ -112,8 +114,9 @@ class TestGrafoMA(unittest.TestCase):
         self.graph.add_node("F")
         self.graph.add_node("AS")
         self.graph.add_edge("F", "AS")
+        self.graph.add_edge("AS", "F")
         degrees = self.graph.get_all_nodes_degree()
-        self.assertEqual(degrees["A"], 1)
+        self.assertEqual(degrees["F"], 1)
         self.assertEqual(degrees["AS"], 1)
 
     def test_get_edges_by_node(self):
