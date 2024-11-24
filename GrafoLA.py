@@ -446,7 +446,7 @@ class GrafoLA(IGrafo):
         euler_path: List[str] = []
         copy_graph = copy.deepcopy(self)
         is_bridge_method = (
-            copy_graph.is_bridge_by_tarjan if by_tarjan else copy_graph.is_bridge
+            copy_graph.is_bridge_by_tarjan2 if by_tarjan else copy_graph.is_bridge
         )
 
         nodes_degree = copy_graph.get_all_nodes_degree()
@@ -820,9 +820,6 @@ class GrafoLA(IGrafo):
                 result[node_name].low = min(result[node_name].low, result[v.name].disc)
 
     def get_bridge_by_tarjan(self):
-        if not self.is_connected():
-            raise ValueError("Graph is not connected")
-
         if self.is_empty():
             return []
 
@@ -839,9 +836,25 @@ class GrafoLA(IGrafo):
 
         for node_name in copy_graph.nodes_map.keys():
             if not result[node_name].visited:
-                self._tarjan_dfs(node_name, result, bridges, time)
+                copy_graph._tarjan_dfs(node_name, result, bridges, time)
 
         return bridges
+    
+    def is_bridge_by_tarjan2(self, edge_name: str):
+        if self.is_empty():
+            return []
+
+        time = [0]
+        bridges: List[str] = []
+
+        result: Dict[str, TarjansNode] = {}
+
+        for node_name in self.nodes_map.keys():
+            result[node_name] = TarjansNode(False, None, 0, 0)
+
+        self._tarjan_dfs(node_name, result, bridges, time)
+
+        return edge_name in bridges
 
     def is_bridge_by_tarjan(self, edge_name: str):
         edge_name = str(edge_name)
