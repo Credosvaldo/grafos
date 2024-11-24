@@ -142,8 +142,8 @@ class GrafoLA(IGrafo):
         if v1 not in self.list_adjacency or v2 not in self.list_adjacency:
             raise ValueError("nodes does not exist")
 
-        for neighbor in self.list_adjacency[predecessor]:
-            if neighbor.name == successor:
+        for neighbor in self.list_adjacency[v1]:
+            if neighbor.name == v2:
                 return True
         return False
 
@@ -864,9 +864,31 @@ class GrafoLA(IGrafo):
         return edge_name in bridges
 
     def _create_random_edges(self):
-        for i in range(len(self.list_adjacency)):
+        size = len(self.list_adjacency)
+        num_edges =  size
+        v1 = v2 = None
+        
+        for i in range(size):
             self.add_edge(i + 1, i + 2)
-
+            
+        v1 = 1
+        
+        for i in range(num_edges-1):
+            print("criando aresta: ", i)
+            
+            v2 = random.randint(1, size)
+            
+            while v1 == v2 or self.thers_node_adjacency(v1, v2) or len(self.list_adjacency[str(v2)]) > size/3:
+                v2 = random.randint(1, size)
+                
+            self.add_edge(v1, v2)
+            v1 = v2
+            
+        self.add_edge(v1, size)
+            
+            
+                
+                
         # for v1_name in self.nodes_map.keys():
         #     print("criando para: ", v1_name)
         #     for v2_name in self.nodes_map.keys():
