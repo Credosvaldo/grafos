@@ -212,6 +212,7 @@ class GrafoLA(IGrafo):
             self.list_adjacency[successor].append(self.nodes_map[predecessor])
 
         self.edges_map[name] = (predecessor, successor, weight)
+        return name
 
     def remove_edge_by_name(self, name: str):
         """
@@ -859,6 +860,9 @@ class GrafoLA(IGrafo):
                 should_add_edge = random.randint(1, 25) == 1
                 if should_add_edge and v1_name != v2_name:
                     if not self.thers_node_adjacency(v1_name, v2_name):
-                        self.add_edge(v1_name, v2_name)
+                        last_add = self.add_edge(v1_name, v2_name)
+            if len(self.list_adjacency[v1_name]) % 2 == 1:
+                self.remove_edge_by_name(last_add)
+
 
     # endregion

@@ -114,6 +114,8 @@ class GrafoMA(IGrafo):
 
         if not self.DIRECTED and v1_index != v2_index:
             self.matrix_adjacency[v2_index][v1_index].append(Edge(name, weight))
+            
+        return name
 
     def remove_edge_by_name(self, name: str):
         name = str(name)

@@ -120,6 +120,7 @@ class GrafoMI(IGrafo):
 
         # Atualizando o mapeamento de arestas
         self.edges_map[name] = (v1, v2, new_edge_index, weight)
+        return name
 
     def remove_edge_by_name(self, name: str):
         name = str(name)
