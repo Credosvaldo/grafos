@@ -3,17 +3,18 @@ from GrafoMA import GrafoMA
 from GrafoLA import GrafoLA
 from GrafoMI import GrafoMI
 import sys
+from datetime import datetime
 
 sys.setrecursionlimit(1500000000)
 
 
-a = GrafoLA(DIRECTED=False, num_nodes=3, random_graph_generation=True)
-print(a)
-print(a.get_euler_path())
-print(a.edges_map)
-print(len(a.edges_map))
-print(a.is_connected())
-exit()
+# a = GrafoLA(DIRECTED=False, num_nodes=3, random_graph_generation=True)
+# print(a)
+# print(a.get_euler_path())
+# print(a.edges_map)
+# print(len(a.edges_map))
+# print(a.is_connected())
+# exit()
 
 # d = GrafoLA(DIRECTED=False)
 # d.add_edge(1, 2, 7)
@@ -86,16 +87,16 @@ exit()
 # a.add_edge(7, 6, 7)
 # a.add_edge(4, 6, 7)
 # print(a)
-# print(a.get_bridge_by_tarjan())
-graph = GrafoMA()
-graph.add_node("F")
-graph.add_node("AS")
-graph.add_edge("F", "AS", name="edge1")
-print(graph.is_bridge("edge1"))
+# # print(a.get_bridge_by_tarjan())
+# graph = GrafoMA()
+# graph.add_node("F")
+# graph.add_node("AS")
+# graph.add_edge("F", "AS", name="edge1")
+# print(graph.is_bridge("edge1"))
 
-print(graph)
-print(graph.matrix())
-print(graph.weight_matrix())
+# print(graph)
+# print(graph.matrix())
+# print(graph.weight_matrix())
 # a = GrafoMA(DIRECTED=True)
 
 # a.add_edge(1, 2, 1)
@@ -113,3 +114,22 @@ print(graph.weight_matrix())
 
 # print(a)
 # print(a.kosaraju())
+
+graphLA = GrafoLA()
+graphLA.to_graph("output/eulerian_graph.gexf")
+
+print("GrafoMA Gerado")
+print(graphLA)
+print(graphLA.is_simple())
+print(graphLA.is_connected())
+startTime = datetime.now()
+print(graphLA.get_euler_path())
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds")
+
+startTime = datetime.now()
+print(graphLA.get_euler_path(by_tarjan=False))
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds")

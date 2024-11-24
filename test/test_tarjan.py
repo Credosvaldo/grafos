@@ -17,9 +17,7 @@ class TestTarjan(unittest.TestCase):
         self.graphMI = GrafoMI(DIRECTED=False)
 
     def test_tarjan_with_one_hundred_nodes(self):
-        self.graphMA = GrafoLA(
-            DIRECTED=False, num_nodes=10, random_graph_generation=True
-        )
+        self.graphMA.gra(self.graphLA)
 
         print("GrafoMA Gerado")
         print(self.graphMA)
