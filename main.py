@@ -8,10 +8,10 @@ from datetime import datetime
 sys.setrecursionlimit(1500000000)
 
 
-a = GrafoLA(DIRECTED=False, num_nodes=1000, random_graph_generation=True)
-print(a)
-#print(a.get_euler_path(by_tarjan=True))
-exit()
+# a = GrafoLA(DIRECTED=False, num_nodes=10000, random_graph_generation=True)
+# print(a)
+# print(a.get_euler_path(by_tarjan=True))
+# exit()
 
 # d = GrafoLA(DIRECTED=False)
 # d.add_edge(1, 2, 7)
@@ -112,22 +112,22 @@ exit()
 # print(a)
 # print(a.kosaraju())
 
-# graphLA = GrafoLA()
-# graphLA.to_graph("output/eulerian_graph_10000.gexf")
+graphLA = GrafoLA()
+graphLA.to_graph("output/eulerian_graph_10000.gexf")
 
 
-# print("GrafoMA Gerado with 10000 nodes")
-# startTime = datetime.now()
-# graphLA.get_euler_path()
-# endTime = datetime.now()
-# elapsedTime = endTime - startTime
-# print(f"Elapsed time: {elapsedTime} seconds with Tarjan")
+print("GrafoMA Gerado with 10000 nodes")
+startTime = datetime.now()
+graphLA.get_euler_path()
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with Tarjan")
 
-# startTime = datetime.now()
-# graphLA.get_euler_path(by_tarjan=False)
-# endTime = datetime.now()
-# elapsedTime = endTime - startTime
-# print(f"Elapsed time: {elapsedTime} seconds with out Tarjan")
+startTime = datetime.now()
+graphLA.get_euler_path(by_tarjan=False)
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with out Tarjan")
 
 # graphLA = GrafoLA()
 # graphLA.to_graph("output/eulerian_graph_1000.gexf")
@@ -162,3 +162,16 @@ exit()
 # endTime = datetime.now()
 # elapsedTime = endTime - startTime
 # print(f"Elapsed time: {elapsedTime} seconds with out Tarjan")
+
+graphLA = GrafoLA(DIRECTED=False, num_nodes=10000, random_graph_generation=True)
+print("GrafoMA Gerado with 1000 nodes de forma automatica")
+startTime = datetime.now()
+graphLA.get_euler_path()
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with Tarjan")
+startTime = datetime.now()
+graphLA.get_euler_path(by_tarjan=False)
+endTime = datetime.now()
+elapsedTime = endTime - startTime
+print(f"Elapsed time: {elapsedTime} seconds with out Tarjan")

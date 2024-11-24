@@ -446,7 +446,7 @@ class GrafoLA(IGrafo):
         euler_path: List[str] = []
         copy_graph = copy.deepcopy(self)
         is_bridge_method = (
-            copy_graph.is_bridge_by_tarjan2 if by_tarjan else copy_graph.is_bridge
+            copy_graph.is_bridge_by_tarjan if by_tarjan else copy_graph.is_bridge
         )
 
         nodes_degree = copy_graph.get_all_nodes_degree()
@@ -464,16 +464,13 @@ class GrafoLA(IGrafo):
         while copy_graph.get_edge_count() > 0:
             euler_path.append(current_node)
             edges_of_current_node = copy_graph.get_edges_by_node(current_node)
-            last_edge = False
 
             if len(edges_of_current_node) == 1:
                 chosen_edge = edges_of_current_node[0]
-                last_edge = True
             else:
                 for edge_name in edges_of_current_node:
                     if not is_bridge_method(edge_name):
                         chosen_edge = edge_name
-                        last_edge = False
                         break
 
             v1, v2, _ = copy_graph.edges_map[chosen_edge]
@@ -712,7 +709,7 @@ class GrafoLA(IGrafo):
     # endregion
     # region XML Section
 
-    def to_xml(self):
+    def to_xml(self, path: str = "output/graphLA.gexf"):
         result = '<?xml version="1.0" encoding="UTF-8"?>\n'
         result += '<gexf xmlns="http://gexf.net/1.3" xmlns:viz="http://gexf.net/1.3/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://gexf.net/1.3 http://gexf.net/1.3/gexf.xsd" version="1.3">\n'
         result += f"<graph defaultedgetype=\"{'directed' if self.DIRECTED else 'undirected'}\">\n"
@@ -720,7 +717,7 @@ class GrafoLA(IGrafo):
         result += "</graph>\n"
         result += "</gexf>\n"
 
-        with open("output/graphLA.gexf", "w") as file:
+        with open(path, "w") as file:
             file.write(result)
 
     def __writeGraph(self):
@@ -839,8 +836,8 @@ class GrafoLA(IGrafo):
                 copy_graph._tarjan_dfs(node_name, result, bridges, time)
 
         return bridges
-    
-    def is_bridge_by_tarjan2(self, edge_name: str):
+
+    def is_bridge_by_tarjan(self, edge_name: str):
         if self.is_empty():
             return []
 
@@ -851,50 +848,37 @@ class GrafoLA(IGrafo):
 
         for node_name in self.nodes_map.keys():
             result[node_name] = TarjansNode(False, None, 0, 0)
-            
-        v1, v2, _ = self.edges_map[edge_name]
+
+        v1, _, _ = self.edges_map[edge_name]
 
         self._tarjan_dfs(v1, result, bridges, time)
 
         return edge_name in bridges
 
-    def is_bridge_by_tarjan(self, edge_name: str):
-        edge_name = str(edge_name)
-        bridges = self.get_bridge_by_tarjan()
-        return edge_name in bridges
-
     def _create_random_edges(self):
         size = len(self.list_adjacency)
-        num_edges =  size
+        num_edges = size
         v1 = v2 = None
-        
+
         for i in range(size):
             self.add_edge(i + 1, i + 2)
-            
+
         v1 = 1
-        
-        for i in range(num_edges-1):
-            print("criando aresta: ", i)
-            
+
+        for i in range(num_edges - 1):
+
             v2 = random.randint(1, size)
-            
-            while v1 == v2 or self.thers_node_adjacency(v1, v2) or len(self.list_adjacency[str(v2)]) > size/3:
+
+            while (
+                v1 == v2
+                or self.thers_node_adjacency(v1, v2)
+                or len(self.list_adjacency[str(v2)]) > size / 3
+            ):
                 v2 = random.randint(1, size)
-                
+
             self.add_edge(v1, v2)
             v1 = v2
-            
+
         self.add_edge(v1, size)
-            
-            
-                
-                
-        # for v1_name in self.nodes_map.keys():
-        #     print("criando para: ", v1_name)
-        #     for v2_name in self.nodes_map.keys():
-        #         should_add_edge = random.randint(1, 25) == 1
-        #         if should_add_edge and v1_name != v2_name:
-        #             if not self.thers_node_adjacency(v1_name, v2_name):
-        #                 self.add_edge(v1_name, v2_name)
 
     # endregion

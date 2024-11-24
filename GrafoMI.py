@@ -197,7 +197,6 @@ class GrafoMI(IGrafo):
     def remove_node(self, name: str):
         name = str(name)
 
-        print(self.nodes_map)
         if name not in self.nodes_map:
             raise ValueError("Node name does not exist")
 
@@ -991,10 +990,23 @@ class GrafoMI(IGrafo):
                 self._tarjan_dfs(node_name, result, bridges, time)
 
         return bridges
-
+    
     def is_bridge_by_tarjan(self, edge_name: str):
-        edge_name = str(edge_name)
-        bridges = self.get_bridge_by_tarjan()
+        if self.is_empty():
+            return []
+
+        time = [0]
+        bridges: List[str] = []
+
+        result: Dict[str, TarjansNode] = {}
+
+        for node_name in self.nodes_map.keys():
+            result[node_name] = TarjansNode(False, None, 0, 0)
+
+        v1, _, _ = self.edges_map[edge_name]
+
+        self._tarjan_dfs(v1, result, bridges, time)
+
         return edge_name in bridges
 
     def reachable(self, v1: str, v2: str, results: Dict[str, Dict[str, DFSNode]] = {}):
