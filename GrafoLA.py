@@ -212,7 +212,6 @@ class GrafoLA(IGrafo):
             self.list_adjacency[successor].append(self.nodes_map[predecessor])
 
         self.edges_map[name] = (predecessor, successor, weight)
-        return name
 
     def remove_edge_by_name(self, name: str):
         """
@@ -478,10 +477,8 @@ class GrafoLA(IGrafo):
             v1, v2, _ = copy_graph.edges_map[chosen_edge]
             current_node = v2 if v1 == current_node else v1
 
-            if last_edge:
-                copy_graph.remove_node(current_node)
-            else:
-                copy_graph.remove_edge_by_name(chosen_edge)
+
+            copy_graph.remove_edge_by_name(chosen_edge)
 
         if copy_graph.get_edge_count() != 0:
             raise ValueError("Graph has more than one connected component")
@@ -854,15 +851,13 @@ class GrafoLA(IGrafo):
         for i in range(len(self.list_adjacency)):
             self.add_edge(i + 1, i + 2)
 
-        for v1_name in self.nodes_map.keys():
-            print("criando para: ", v1_name)
-            for v2_name in self.nodes_map.keys():
-                should_add_edge = random.randint(1, 25) == 1
-                if should_add_edge and v1_name != v2_name:
-                    if not self.thers_node_adjacency(v1_name, v2_name):
-                        last_add = self.add_edge(v1_name, v2_name)
-            if len(self.list_adjacency[v1_name]) % 2 == 1:
-                self.remove_edge_by_name(last_add)
+        # for v1_name in self.nodes_map.keys():
+        #     print("criando para: ", v1_name)
+        #     for v2_name in self.nodes_map.keys():
+        #         should_add_edge = random.randint(1, 25) == 1
+        #         if should_add_edge and v1_name != v2_name:
+        #             if not self.thers_node_adjacency(v1_name, v2_name):
+        #                 self.add_edge(v1_name, v2_name)
 
 
     # endregion
