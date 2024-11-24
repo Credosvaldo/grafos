@@ -2,9 +2,12 @@ from models.DFSNode import DFSNode
 from GrafoMA import GrafoMA
 from GrafoLA import GrafoLA
 from GrafoMI import GrafoMI
+import sys
+
+sys.setrecursionlimit(1500000000)
 
 
-a = GrafoMA(DIRECTED=False, num_nodes=100000, random_graph_generation=True)
+a = GrafoLA(DIRECTED=False, num_nodes=10000, random_graph_generation=True)
 print(a)
 print(a.edges_map)
 print(len(a.edges_map))

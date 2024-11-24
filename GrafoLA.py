@@ -7,6 +7,7 @@ from models.ExcludedEdge import ExcludedEdge
 from models.NodeLA import NodeLA
 from enums.ConnectivityDegree import ConnectivityDegree
 import copy
+import random
 import xmltodict
 
 
@@ -18,6 +19,7 @@ class GrafoLA(IGrafo):
         num_nodes: int = 0,
         nodes: List[Tuple[str, float]] = [],
         edges: List[Tuple[str, str, float]] = [],
+        random_graph_generation: bool = False,
     ):
 
         self.nodes_map: Dict[str, NodeLA] = {}
@@ -26,7 +28,7 @@ class GrafoLA(IGrafo):
         )  # predecessor , successor, weight
         self.DIRECTED = DIRECTED
         self.list_adjacency: Dict[str, List[NodeLA]] = {}
-        self.create_adjacency_list(num_nodes, nodes, edges)
+        self.create_adjacency_list(num_nodes, nodes, edges, random_graph_generation)
 
     def __str__(self) -> str:
         result = " List Adjacency\n"
@@ -50,6 +52,7 @@ class GrafoLA(IGrafo):
         num_nodes: int,
         nodes: List[Tuple[str, float]] = [],
         edges: List[Tuple[str, str, float]] = [],
+        random_graph_generation: bool = False,
     ):
         if nodes == [] and num_nodes == 0:
             return {}
@@ -74,6 +77,9 @@ class GrafoLA(IGrafo):
 
         for edge in edges:
             self.add_edge(edge[0], edge[1], edge[2])
+            
+        if random_graph_generation:
+            self._create_random_edges()
 
     # region Node Section
     def add_node(self, name: str = None, weight: float = 1.0):
@@ -842,4 +848,15 @@ class GrafoLA(IGrafo):
         bridges = self.get_bridge_by_tarjan()
         return edge_name in bridges
 
+
+    def _create_random_edges(self):
+        for i in range(len(self.list_adjacency)):
+            self.add_edge(i + 1, i + 2)
+            
+        for v1_name in self.nodes_map.keys():
+            print('criando para: ', v1_name)
+            for v2_name in self.nodes_map.keys():
+                should_add_edge = random.randint(1, 25) == 1
+                if should_add_edge and v1_name != v2_name:
+                    self.add_edge(v1_name, v2_name)
     # endregion
