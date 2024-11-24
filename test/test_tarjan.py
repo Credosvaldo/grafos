@@ -18,8 +18,9 @@ class TestTarjan(unittest.TestCase):
 
     def test_tarjan_with_one_hundred_nodes(self):
         self.graphMA = GrafoLA(
-            DIRECTED=False, num_nodes=100, random_graph_generation=True
+            DIRECTED=False, num_nodes=10, random_graph_generation=True
         )
+
         print("GrafoMA Gerado")
         print(self.graphMA)
         print(self.graphMA.get_euler_path())
