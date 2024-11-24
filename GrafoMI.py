@@ -893,7 +893,7 @@ class GrafoMI(IGrafo):
 
         node_index = self.nodes_map[node_name].index
 
-        for v in self.matrix_adjacency[node_index]:
+        for v in self.matrix_incidency[node_index]:
             if len(v) == 0:
                 continue
 
