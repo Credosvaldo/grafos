@@ -7,8 +7,9 @@ import sys
 sys.setrecursionlimit(1500000000)
 
 
-a = GrafoLA(DIRECTED=False, num_nodes=10000, random_graph_generation=True)
+a = GrafoLA(DIRECTED=False, num_nodes=10, random_graph_generation=True)
 print(a)
+print(a.get_euler_path())
 print(a.edges_map)
 print(len(a.edges_map))
 print(a.is_connected())

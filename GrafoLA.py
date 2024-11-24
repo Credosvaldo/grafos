@@ -858,5 +858,6 @@ class GrafoLA(IGrafo):
             for v2_name in self.nodes_map.keys():
                 should_add_edge = random.randint(1, 25) == 1
                 if should_add_edge and v1_name != v2_name:
-                    self.add_edge(v1_name, v2_name)
+                    if not self.thers_node_adjacency(v1_name, v2_name):
+                        self.add_edge(v1_name, v2_name)
     # endregion
