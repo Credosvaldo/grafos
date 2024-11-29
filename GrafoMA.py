@@ -19,7 +19,10 @@ class GrafoMA(IGrafo):
         self,
         DIRECTED: bool = True,
         num_nodes: int = 0,
+        num_edges: int = 0,
         nodes: List[Tuple[str, float]] = [],
+        ramdom_graph_shold_be_simple: bool = False,
+        ramdom_graph_shold_be_linear: bool = False,
         random_graph_generation: bool = False,
     ):
         self.matrix_adjacency: List[List[List[Edge]]] = self._create_matrix(num_nodes)
@@ -27,7 +30,7 @@ class GrafoMA(IGrafo):
         self.edges_map: Dict[str, Tuple[str, str, int]] = {}
         self.DIRECTED = DIRECTED
         self.excluded_nodes_index = []
-        self._fill_nodes_map(num_nodes, nodes, random_graph_generation)
+        self._fill_nodes_map(num_nodes, num_edges, nodes, ramdom_graph_shold_be_simple, ramdom_graph_shold_be_linear, random_graph_generation)
 
     def matrix(self):
         result = "   Adjacency Matrix\n\n"
@@ -299,12 +302,24 @@ class GrafoMA(IGrafo):
     def _fill_nodes_map(
         self,
         num_nodes: int,
+        num_edges: int,
         nodes: List[Tuple[str, float]],
-        random_graph_generation: bool = False,
+        should_be_simple: bool,
+        shold_be_linear: bool,
+        random_graph_generation: bool,
     ):
         if not nodes:
             for i in range(num_nodes):
                 self.nodes_map[str(i + 1)] = Node(i)
+                
+            if shold_be_linear:
+                for i in range(num_nodes - 1):
+                    self.add_edge(str(i + 1), str(i + 2))
+            elif should_be_simple:
+                self._crete_simple_graph_ramdom_edges(num_edges)
+            else:
+                self._crete_ramdom_edges(num_edges)
+            
             if random_graph_generation:
                 self._create_random_edges()
 
@@ -874,3 +889,23 @@ class GrafoMA(IGrafo):
 
                 if v1_index < v2_index and should_add_edge:
                     self.add_edge(v1_name, v2_name, 1)
+
+    def _crete_simple_graph_ramdom_edges(self, num_edges: int):
+        size = len(self.nodes_map)
+        
+        for _ in range(num_edges):
+            v1 = random.randint(1, size)
+            v2 = v1
+            
+            while v2 == v1 or self.thers_edge_by_nodes(str(v1), str(v2)):
+                v2 = random.randint(1, size)
+                
+            self.add_edge(str(v1), str(v2))
+            
+    def _crete_ramdom_edges(self, num_edges: int):
+        size = len(self.nodes_map)
+        
+        for _ in range(num_edges):
+            v1 = random.randint(1, size)
+            v2 = random.randint(1, size)
+            self.add_edge(str(v1), str(v2))
