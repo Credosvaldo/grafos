@@ -1,4 +1,6 @@
 from IGrafo import IGrafo
+from datetime import datetime
+
 
 def options_switch(opcao: int, graph: IGrafo):
     # adicionar nó
@@ -66,8 +68,12 @@ def options_switch(opcao: int, graph: IGrafo):
         _xml_to_graph(graph)
     elif opcao == 23:
         print(graph)
-    
-    
+    elif opcao == 24:
+        tarjan(graph)
+    elif opcao == 25:
+        naive(graph)
+
+
 def _add_node(graph: IGrafo):
     edge_name = input("Digite o nome do nó: ")
     edge_weight = None
@@ -75,19 +81,21 @@ def _add_node(graph: IGrafo):
         edge_weight = float(input("Digite o peso do nó: "))
     except ValueError:
         print("Por favor, insira um número válido.")
-    
+
     try:
         graph.add_node(edge_name, edge_weight)
     except ValueError as e:
         print(e)
-        
+
+
 def _remove_node(graph: IGrafo):
     edge_name = input("Digite o nome do nó: ")
     try:
         graph.remove_node(edge_name)
     except ValueError as e:
         print(e)
-        
+
+
 def _add_edge(graph: IGrafo):
     predecessor = input("Digite o nó de origem: ")
     successor = input("Digite o nó de destino: ")
@@ -97,19 +105,21 @@ def _add_edge(graph: IGrafo):
     except ValueError:
         print("Por favor, insira um número válido.")
     edge_name = input("Digite o nome da aresta: ")
-    
+
     try:
         graph.add_edge(predecessor, successor, edge_weight, edge_name)
     except ValueError as e:
         print(e)
-        
+
+
 def _remove_edge_by_name(graph: IGrafo):
     edge_name = input("Digite o nome da aresta: ")
     try:
         graph.remove_edge_by_name(edge_name)
     except ValueError as e:
         print(e)
-        
+
+
 def _remove_all_edges_by_nodes(graph: IGrafo):
     predecessor = input("Digite o nó de origem: ")
     successor = input("Digite o nó de destino: ")
@@ -117,7 +127,8 @@ def _remove_all_edges_by_nodes(graph: IGrafo):
         graph.remove_all_edges_by_nodes(predecessor, successor)
     except ValueError as e:
         print(e)
-        
+
+
 def _thers_node_adjacency(graph: IGrafo):
     predecessor = input("Digite o nó de origem: ")
     successor = input("Digite o nó de destino: ")
@@ -125,6 +136,7 @@ def _thers_node_adjacency(graph: IGrafo):
         print(graph.thers_node_adjacency(predecessor, successor))
     except ValueError as e:
         print(e)
+
 
 def _thers_edge_adjacency(graph: IGrafo):
     edge1 = input("Digite o nome da primeira aresta: ")
@@ -134,12 +146,14 @@ def _thers_edge_adjacency(graph: IGrafo):
     except ValueError as e:
         print(e)
 
+
 def _thers_edge_by_name(graph: IGrafo):
     edge_name = input("Digite o nome da aresta: ")
     try:
         print(graph.thers_edge_by_name(edge_name))
     except ValueError as e:
         print(e)
+
 
 def _thers_edge_by_nodes(graph: IGrafo):
     predecessor = input("Digite o nó de origem: ")
@@ -149,40 +163,52 @@ def _thers_edge_by_nodes(graph: IGrafo):
     except ValueError as e:
         print(e)
 
+
 def _get_edge_count(graph: IGrafo):
     print(graph.get_edge_count())
+
 
 def _get_node_count(graph: IGrafo):
     print(graph.get_node_count())
 
+
 def _is_empty(graph: IGrafo):
     print(graph.is_empty())
+
 
 def _is_complete(graph: IGrafo):
     print(graph.is_complete())
 
+
 def _is_simple(graph: IGrafo):
     print(graph.is_simple())
+
 
 def _is_connected(graph: IGrafo):
     print(graph.is_connected())
 
+
 def _kosaraju(graph: IGrafo):
     print(graph.kosaraju())
+
 
 def _get_articulations(graph: IGrafo):
     print(graph.get_articulations())
 
+
 def _get_bridges(graph: IGrafo):
     print(graph.get_bridge())
+
 
 def _is_eulerian(graph: IGrafo):
     is_tarjan = None
     while is_tarjan != "s" and is_tarjan != "n":
-        is_tarjan = input("Deseja verificar se o grafo é euleriano por meio do algoritmo de Tarjan? (s/n): ").lower()
-    
+        is_tarjan = input(
+            "Deseja verificar se o grafo é euleriano por meio do algoritmo de Tarjan? (s/n): "
+        ).lower()
+
     is_tarjan = is_tarjan == "s"
-    
+
     try:
         euler = graph.get_euler_path(by_tarjan=is_tarjan)
         print(euler)
@@ -190,13 +216,36 @@ def _is_eulerian(graph: IGrafo):
         print(e)
         return
 
+
 def _graph_to_xml(graph: IGrafo):
     print("Processando...")
     graph.to_xml()
     print("Grafo transformado em XML com sucesso.")
-    
+
+
 def _xml_to_graph(graph: IGrafo):
     file_path = input("Digite o caminho do arquivo XML: ")
     print("Processando...")
     graph.to_graph(file_path)
     print("XML transformado em grafo com sucesso.")
+
+
+def tarjan(graph: IGrafo):
+
+    initialTime = datetime.now()
+
+    print(graph.get_bridge_by_tarjan())
+
+    finalTime = datetime.now()
+
+    print("Tempo de execução: ", finalTime - initialTime)
+
+
+def naive(graph: IGrafo):
+    initialTime = datetime.now()
+
+    print(graph.get_bridge())
+
+    finalTime = datetime.now()
+
+    print("Tempo de execução: ", finalTime - initialTime)

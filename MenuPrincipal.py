@@ -6,6 +6,7 @@ from typing import Type
 from MenuHandler import options_switch
 import sys
 
+
 def print_opcoes_grafos(graph: IGrafo):
     print("\nMenu de Opções")
     print("=" * 50)
@@ -24,35 +25,39 @@ def print_opcoes_grafos(graph: IGrafo):
     print("14 - Verificar se o grafo é completo")
     print("15 - Verificar se o grafo é simples")
     print("16 - Verificar conectividade do grafo")
-    print("17 - Utilizar Kosaraju para calcular o número de componentes fortemente conexos")
+    print(
+        "17 - Utilizar Kosaraju para calcular o número de componentes fortemente conexos"
+    )
     print("18 - Pegar articulações")
     print("19 - Pegar pontes")
     print("20 - Verificar se o grafo é euleriano")
     print("21 - Transformar grafo em XML")
     print("22 - Transformar XML em grafo")
     print("23 - Print grafo")
+    print("24 - Obter pontes com Tarjan")
+    print("25 - Obter pontes com Naive")
     print("0 - Sair")
-    
-    
+
+
 def main_menu():
     print("TRABALHO FINAL - TEORIA DOS GRAFOS E COMPUTABILIDADE\n")
     print("Menu Inicial")
     print("=" * 50)
-    
+
     directed = None
     graph_choice = None
     random_graph = None
     nodes = None
     edges = None
     grafo_linear = None
-    
+
     while directed not in [1, 2]:
         try:
             directed = int(input("O grafo será direcionado? (1 - Sim, 2 - Não): "))
         except ValueError:
             print("Por favor, insira um número válido.")
     directed = directed == 1
-    
+
     while graph_choice not in [1, 2, 3]:
         try:
             print("\nEscolha a representação a ser usada:")
@@ -62,11 +67,13 @@ def main_menu():
             graph_choice = int(input("Digite sua escolha: "))
         except ValueError:
             print("Por favor, insira um número válido.")
-            
-    while random_graph not in ['y', 'n']:
-        random_graph = input("\nDeseja criar um grafo aleatório? (y - Sim, n - Não): ").lower()
-    
-    if random_graph == 'y':
+
+    while random_graph not in ["y", "n"]:
+        random_graph = input(
+            "\nDeseja criar um grafo aleatório? (y - Sim, n - Não): "
+        ).lower()
+
+    if random_graph == "y":
         while nodes is None or nodes < 1:
             try:
                 nodes = int(input("Quantos nós deseja?: "))
@@ -77,18 +84,35 @@ def main_menu():
                 edges = int(input("Quantas arestas deseja?: "))
             except ValueError:
                 print("Por favor, insira um número válido.")
-        
-        while grafo_linear not in ['y', 'n']:
-            grafo_linear = input("\nDeseja que o grafo seja linear? (y - Sim, n - Não): ").lower()
-    grafo_linear = grafo_linear == 'y'
-    
+
+        while grafo_linear not in ["y", "n"]:
+            grafo_linear = input(
+                "\nDeseja que o grafo seja linear? (y - Sim, n - Não): "
+            ).lower()
+    grafo_linear = grafo_linear == "y"
+
     graph: Type[IGrafo]
     if graph_choice == 1:
-        graph = GrafoMA(DIRECTED=directed, num_nodes=nodes or 0, num_edges=edges or 0, ramdom_graph_shold_be_linear=grafo_linear)
+        graph = GrafoMA(
+            DIRECTED=directed,
+            num_nodes=nodes or 0,
+            num_edges=edges or 0,
+            ramdom_graph_shold_be_linear=grafo_linear,
+        )
     elif graph_choice == 2:
-        graph = GrafoMI(DIRECTED=directed, num_nodes=nodes or 0, num_edges=edges or 0, ramdom_graph_shold_be_linear=grafo_linear)
+        graph = GrafoMI(
+            DIRECTED=directed,
+            num_nodes=nodes or 0,
+            num_edges=edges or 0,
+            ramdom_graph_shold_be_linear=grafo_linear,
+        )
     else:
-        graph = GrafoLA(DIRECTED=directed, num_nodes=nodes or 0, num_edges=edges or 0, ramdom_graph_shold_be_linear=grafo_linear)
+        graph = GrafoLA(
+            DIRECTED=directed,
+            num_nodes=nodes or 0,
+            num_edges=edges or 0,
+            ramdom_graph_shold_be_linear=grafo_linear,
+        )
 
     print("=" * 50)
     while True:
@@ -96,13 +120,13 @@ def main_menu():
         opcao = None
         try:
             opcao = int(input("\nDigite sua escolha: "))
-            if opcao < 0 or opcao > 23:
+            if opcao < 0 or opcao > 25:
                 print("Por favor, insira um número válido.")
                 continue
             elif opcao == 0:
                 sys.exit()
             else:
                 options_switch(opcao, graph)
-                
+
         except ValueError:
             print("Por favor, insira um número válido.")
