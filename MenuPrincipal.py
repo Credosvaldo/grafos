@@ -15,7 +15,6 @@ def print_opcoes_grafos(graph: IGrafo):
     print("4 - Remover Aresta pelo nome")
     print("5 - Remover Aresta por nós")
     print("6 - Verificar adjacência entre nós")
-    print("7 - Verificar se há apenas uma aresta entre dois nós")
     print("8 - Verificar adjacência entre arestas")
     print("9 - Verificar se há aresta pelo nome")
     print("10 - Verificar se há aresta entre nós")
@@ -30,7 +29,7 @@ def print_opcoes_grafos(graph: IGrafo):
     print("19 - Pegar pontes")
     print("20 - Verificar se o grafo é euleriano")
     print("21 - Transformar grafo em XML")
-    print("22 - Transformar XML em grafo")
+    print("21 - Transformar XML em grafo")
     print("0 - Sair")
     
     
@@ -96,7 +95,7 @@ def main_menu():
         opcao = None
         try:
             opcao = int(input("\nDigite sua escolha: "))
-            if opcao < 0 or opcao > 22:
+            if opcao < 0 or opcao > 21:
                 print("Por favor, insira um número válido.")
                 continue
             elif opcao == 0:
