@@ -177,10 +177,18 @@ def _get_bridges(graph: IGrafo):
     print(graph.get_bridge())
 
 def _is_eulerian(graph: IGrafo):
-    by_tarjan = None
-    while by_tarjan != "s" and by_tarjan != "n":
-        by_tarjan = input("Deseja verificar se o grafo é euleriano por meio do algoritmo de Tarjan? (s/n): ").lower()
-    print(graph.get_euler_path())
+    is_tarjan = None
+    while is_tarjan != "s" and is_tarjan != "n":
+        is_tarjan = input("Deseja verificar se o grafo é euleriano por meio do algoritmo de Tarjan? (s/n): ").lower()
+    
+    is_tarjan = is_tarjan == "s"
+    
+    try:
+        euler = graph.get_euler_path(by_tarjan=is_tarjan)
+        print(euler)
+    except ValueError as e:
+        print(e)
+        return
 
 def _graph_to_xml(graph: IGrafo):
     print("Processando...")
