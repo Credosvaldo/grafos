@@ -29,7 +29,8 @@ def print_opcoes_grafos(graph: IGrafo):
     print("19 - Pegar pontes")
     print("20 - Verificar se o grafo é euleriano")
     print("21 - Transformar grafo em XML")
-    print("21 - Transformar XML em grafo")
+    print("22 - Transformar XML em grafo")
+    print("23 - Print grafo")
     print("0 - Sair")
     
     
@@ -95,7 +96,7 @@ def main_menu():
         opcao = None
         try:
             opcao = int(input("\nDigite sua escolha: "))
-            if opcao < 0 or opcao > 21:
+            if opcao < 0 or opcao > 23:
                 print("Por favor, insira um número válido.")
                 continue
             elif opcao == 0:

@@ -64,6 +64,8 @@ def options_switch(opcao: int, graph: IGrafo):
     # transformar XML em grafo
     elif opcao == 22:
         _xml_to_graph(graph)
+    elif opcao == 23:
+        print(graph)
     
     
 def _add_node(graph: IGrafo):
